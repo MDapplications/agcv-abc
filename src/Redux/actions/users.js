@@ -60,6 +60,52 @@ const deleteUserError = error => {
 }
 
 
+//En attente de réponse de l'API
+const editUserLoading = () => {
+    return {
+        type: EDIT_USER_LOADING
+    }
+}
+
+//Réponse d'erreur
+const editUserError = error => {
+    return {
+        type: EDIT_USER_ERROR,     
+        payload: error
+    }
+}
+
+
+
+
+export const editUser = (token, userData) => {
+    return dispatch => {
+
+        const username = userData.identifiant
+        const {actif, role} = userData
+
+        dispatch(editUserLoading())
+
+        axios.put(
+            `${REACT_APP_AGCV_API_URL}/users/${userData.id}`,
+            {   
+                username, 
+                role,
+                actif
+            },
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(() => {
+            dispatch(initUsers())
+            dispatch(getAllUsers(token))
+        })
+        .catch(res => {
+            dispatch(editUserError(res.response.data.message))
+        })
+
+    }
+}
+
 
 
 
