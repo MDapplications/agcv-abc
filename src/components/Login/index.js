@@ -1,15 +1,14 @@
 import React, { useState } from 'react'
-import {Container, Card, Form, Row, Button, Alert} from 'react-bootstrap'
+import {Container, Card, Form, Row, Button} from 'react-bootstrap'
 import axios from 'axios'
-import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { getUser } from '../../Redux/actions/user'
+import AlertDanger from '../AlertDanger'
+import toast from 'react-hot-toast'
 
 
 const Login = () => {
-    
-    //Redux
-    const user = useSelector(state => state.user)
 
     //Hooks
     const navigate = useNavigate()
@@ -55,6 +54,7 @@ const Login = () => {
             setErrorAlert(errorData)
             const dataUser = {
                 username: res.data.data.username,
+                role: res.data.data.role,
                 token: res.data.token
             }
             dispatch(getUser(dataUser))
@@ -62,7 +62,23 @@ const Login = () => {
             setLoginData(data)
         })
         .catch(err => {
-            setErrorAlert({code: err.response.status, message: err.response.data.message, enabled: true})
+            console.log(err.response)
+            if (err.response) {
+                setErrorAlert({code: err.response.status, message: err.response.data.message, enabled: true})
+            } else {
+                setErrorAlert({code: 500, message: 'Problème de connexion à la base de données.', enabled: true})
+            }
+
+            toast.error('Connexion impossible !',
+            {
+                style: {
+                    border: '1px solid #d61b24',
+                    padding: '16px',
+                    color: '#d61b24',
+                },
+                duration: 5000,
+            })
+            
             setLoginData(data)
         })
 
@@ -79,9 +95,7 @@ const Login = () => {
 
 
     const alertMessage = errorAlert.enabled ?
-    <Alert key='danger' variant='danger'>
-        {errorAlert.message}
-    </Alert>
+    <AlertDanger errorMsg={errorAlert.message}/>
     : null
 
 

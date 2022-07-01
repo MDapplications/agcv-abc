@@ -1,0 +1,9 @@
+.super-admin {
+    background-color: darkgoldenrod;
+    color: black;
+}
+
+.super-admin:hover {
+    background-color: rgb(250, 222, 150);
+    color: black;
+}

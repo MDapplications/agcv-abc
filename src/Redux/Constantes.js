@@ -1,2 +1,14 @@
+//User log
 export const GET_USER = "GET_USER"
 export const INIT_USER = "INIT_USER"
+
+
+//Gestion utilisateurs
+export const GET_USERS_LOADING = "GET_USERS_LOADING"
+export const GET_USERS_SUCCESS = "GET_USERS_SUCCESS"
+export const GET_USERS_ERROR = "GET_USERS_ERROR"
+export const EDIT_USER_LOADING = "EDIT_USER_LOADING"
+export const EDIT_USER_ERROR = "EDIT_USER_ERROR"
+export const DELETE_USER_LOADING = "DELETE_USER_LOADING"
+export const DELETE_USER_ERROR = "DELETE_USER_ERROR"
+export const REMOVE_ALL_USERS = "REMOVE_ALL_USERS"

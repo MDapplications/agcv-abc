@@ -1,8 +1,8 @@
 import React from 'react'
-//import ReactTooltip from 'react-tooltip'
-import { HiOutlineLogout } from 'react-icons/hi'
+import { BiPowerOff } from 'react-icons/bi'
 import { useDispatch } from 'react-redux'
 import { initUser } from '../../Redux/actions/user'
+import { initUsers } from '../../Redux/actions/users'
 import { useNavigate } from 'react-router-dom'
 
 
@@ -15,6 +15,7 @@ const BtnLogout = () => {
     //bouton LogOut
     const handleLogout = () => {
         dispatch(initUser())
+        dispatch(initUsers())
         navigate('/')
     }
 
@@ -25,7 +26,7 @@ const BtnLogout = () => {
                 type="button" 
                 className="btn btn-danger" 
                 onClick={handleLogout}>
-                    <HiOutlineLogout/>
+                    <BiPowerOff/>
             </button>
 
             {/* <ReactTooltip id="buttonLogout" place="left" effect="solid"/> */}

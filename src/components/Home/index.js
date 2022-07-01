@@ -14,7 +14,7 @@ const Home = () => {
     const navigate = useNavigate()
 
 
-    useEffect(() => {if (user.token === '') navigate('/')}, [])
+    useEffect(() => {if (user.token === '') navigate('/')}, [user, navigate])
     
 
 

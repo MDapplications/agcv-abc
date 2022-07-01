@@ -5,6 +5,7 @@ import {    GET_USER,
 //initial state
 const initialState = {
     username: '',
+    role: '',
     token: ''
 }
 

@@ -5,7 +5,7 @@ import NavBarAdmin from '../NavBarAdmin'
 const Admin = () => {
     return (
         <>
-            <NavBarAdmin context/>
+            <NavBarAdmin/>
             <Outlet/>
         </>        
     )

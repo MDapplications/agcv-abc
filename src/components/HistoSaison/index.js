@@ -5,7 +5,7 @@ const HistoSaison = () => {
     return (
         <>
             <NavBarHome context='histoSaison'/>
-
+            <div>HistoSaison</div>
         </>
     )
 }

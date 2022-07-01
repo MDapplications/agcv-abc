@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import {Container, Card, Form, Row, Button, Alert} from 'react-bootstrap'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import toast, { Toaster } from 'react-hot-toast'
+
 
 const SignUp = () => {
 
@@ -13,6 +15,9 @@ const SignUp = () => {
     const errorData = {code: 0, message: '', enabled: false}
     const {REACT_APP_AGCV_API_URL} = process.env
    
+
+    //Hooks
+    const navigate = useNavigate()
 
 
     //States
@@ -44,12 +49,27 @@ const SignUp = () => {
             { headers: { "Content-Type": "application/json" } }
         )
         .then((res) => {
-            console.log(res)
             setErrorAlert(errorData)
+            setLoginData(data)
+
+            toast.success('Inscription réussi !',
+            {
+                style: {
+                    border: '1px solid #00B35B',
+                    padding: '16px',
+                    color: '#00B35B',
+                },
+                duration: 5000,
+            })
+            navigate('/')
+            
         })
         .catch(err => {
-            //console.log(err)
-            setErrorAlert({code: err.response.status, message: err.response.data.message, enabled: true})
+            if (err.response) {
+                setErrorAlert({code: err.response.status, message: err.response.data.message, enabled: true})
+            } else {
+                setErrorAlert({code: 500, message: 'Problème de connexion à la base de données.', enabled: true})
+            } 
         })
     }
 
@@ -81,6 +101,7 @@ const SignUp = () => {
     //render
     return (
         <Container className='mt-4 d-flex justify-content-center'>
+                       
             <Card style={{ width: '30rem' }}>
                 <Card.Header>
                     <h4 className='mt-2'>Inscription</h4>
