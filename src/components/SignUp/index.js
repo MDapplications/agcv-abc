@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {Container, Card, Form, Row, Button, Alert} from 'react-bootstrap'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 
 
 const SignUp = () => {

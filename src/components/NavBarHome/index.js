@@ -1,13 +1,15 @@
 import React from 'react'
-import { Container, Nav, Navbar } from 'react-bootstrap'
+import { Container, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import BtnLogout from '../BtnLogout'
+import './index.css'
 
-const NavBarHome = ({context}) => {
+const NavBarHome = () => {
     
     //Redux
-    const user = useSelector(state => state.user)
+    const {username, role} = useSelector(state => state.user)
+    const page = useSelector(state => state.page)
 
 
     //Style
@@ -16,16 +18,15 @@ const NavBarHome = ({context}) => {
     }
 
 
-    const {username} = user
-    
-
-    const displayNav = context === 'home' 
-    ? context === 'histoSaison' 
+    const displayNav = page === 'home' 
+    ? page === 'histoSaison' 
         ? null 
-        : <Link className='nav-link link-secondary' to='/histoSaison'>Historiques des saisons</Link>
-    : <Link className='nav-link link-secondary' to='/home'>Saison actuelle</Link>
+        : <Link id='a-home' className='nav-link link-secondary align-middle' to='/histoSaison'>Historiques des saisons</Link>
+    : <Link id='back-home' className='nav-link link-secondary align-middle' to='/home'>Page principale</Link>
     
     
+    const displayLinkAdmin = role > 1 && <Link id='go-admin' className='nav-link link-secondary align-middle' to='/admin'>Admin</Link>
+
 
     //render
     return (
@@ -37,7 +38,7 @@ const NavBarHome = ({context}) => {
                 <div className='d-flex justify-content-end'>
                     <Nav className='me-5'>    
                         {displayNav}
-                        <Link className='nav-link link-secondary' to='/admin'>Admin</Link>
+                        {displayLinkAdmin}
                     </Nav>
                     <BtnLogout/>
                 </div>

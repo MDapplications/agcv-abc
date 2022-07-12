@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {Container, Card, Form, Row, Button} from 'react-bootstrap'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { getUser } from '../../Redux/actions/user'
 import AlertDanger from '../AlertDanger'
 import toast from 'react-hot-toast'
+import { initPage } from '../../Redux/actions/pages'
 
 
 const Login = () => {
@@ -31,7 +32,10 @@ const Login = () => {
 
     const { username, password } = loginData
     
-    
+
+    useEffect(() => {
+        dispatch(initPage())
+    }, [dispatch])
      
     
     const handleChange = event => setLoginData({...loginData, [event.target.id]: event.target.value})
@@ -53,6 +57,7 @@ const Login = () => {
             //console.log(res)
             setErrorAlert(errorData)
             const dataUser = {
+                id: res.data.data.id,
                 username: res.data.data.username,
                 role: res.data.data.role,
                 token: res.data.token
@@ -62,14 +67,15 @@ const Login = () => {
             setLoginData(data)
         })
         .catch(err => {
-            console.log(err.response)
-            if (err.response) {
-                setErrorAlert({code: err.response.status, message: err.response.data.message, enabled: true})
-            } else {
-                setErrorAlert({code: 500, message: 'Problème de connexion à la base de données.', enabled: true})
-            }
 
-            toast.error('Connexion impossible !',
+            setErrorAlert({code: err.response.status, message: err.response.data.message, enabled: true})
+            setLoginData(data)
+
+        })
+        .catch(err => {
+            setErrorAlert({code: 500, message: 'Problème de connexion réseau.', enabled: true})
+      
+            toast.error('Erreur de connexion !',
             {
                 style: {
                     border: '1px solid #d61b24',

@@ -3,8 +3,10 @@ import {    GET_USERS_LOADING,
             GET_USERS_ERROR,
             EDIT_USER_LOADING,
             EDIT_USER_ERROR,
+            EDIT_USER_SUCCESS,
             DELETE_USER_LOADING,
             DELETE_USER_ERROR,
+            DELETE_USER_SUCCESS,
             REMOVE_ALL_USERS } from '../Constantes'
 
 
@@ -15,7 +17,9 @@ const initialState = {
     Users: [],
     error: '',
     errorDelete: '',
-    errorEdit: ''
+    errorEdit: '',
+    isEditSuccess: false,
+    isDeleteSuccess: false,
 }
 
 
@@ -24,36 +28,56 @@ const reducerUsers = (state=initialState, action) => {
 
     switch (action.type) {
 
-        case GET_USERS_LOADING:
-            return {
-                ...state,
-                isLoading: true
-            }
-
         case DELETE_USER_LOADING:
             return {
                 ...state,
-                isLoadingDelete: true
+                isLoadingDelete: true,
+                errorDelete: '',
+                isDeleteSuccess: false
             }
 
         case DELETE_USER_ERROR:
             return {
                 ...state,
                 isLoadingDelete: false,
-                error: action.payload
+                errorDelete: action.payload,
+            }
+
+        case DELETE_USER_SUCCESS:
+            return {
+                ...state,
+                isLoadingDelete: false,
+                isDeleteSuccess: true
             }
 
         case EDIT_USER_LOADING:
             return {
                 ...state,
-                isLoadingEdit: true
+                isLoadingEdit: true,
+                errorEdit: '',
+                isEditSuccess: false
             }
 
         case EDIT_USER_ERROR:
             return {
                 ...state,
                 isLoadingEdit: false,
-                error: action.payload
+                errorEdit: action.payload,
+            }
+
+        case EDIT_USER_SUCCESS:
+            return {
+                ...state,
+                isLoadingEdit: false,
+                isEditSuccess: true,
+            }
+
+        case GET_USERS_LOADING:
+            return {
+                ...state,
+                isLoading: true,
+                Users: [],
+                error: ''
             }
 
         case GET_USERS_SUCCESS:
@@ -71,8 +95,7 @@ const reducerUsers = (state=initialState, action) => {
                 error: action.payload
             }
 
-        case REMOVE_ALL_USERS:
-            return initialState
+        case REMOVE_ALL_USERS: return initialState
             
         default: return state
     }

@@ -1,10 +1,30 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Navbar, Container } from 'react-bootstrap'
 import { Toaster } from 'react-hot-toast'
-import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
 
 
 const Header = () => {
+
+    //Redux
+    const {token} = useSelector(state => state.user)
+    const page = useSelector(state => state.page)
+
+
+    //Hooks
+    const navigate = useNavigate()
+
+    
+    //retour page de connexion si absence de compte utilisateur connecté
+    useEffect(() => {
+        if (page !== ('')) {
+            if (token === '') navigate('/')
+        }
+    }, [token, navigate])
+
+
+    //render
     return (
         <>
             <Navbar bg="primary" className='d-print-none'>

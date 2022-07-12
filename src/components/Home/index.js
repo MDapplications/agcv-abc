@@ -1,23 +1,11 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Container } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import NavBarHome from '../NavBarHome'
 
 const Home = () => {
 
-    //Redux
-    const user = useSelector(state => state.user)
-
-
-    //Hooks
-    const navigate = useNavigate()
-
-
-    useEffect(() => {if (user.token === '') navigate('/')}, [user, navigate])
     
-
-
     //render
     return (
         <>

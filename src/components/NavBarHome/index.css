@@ -1,0 +1,16 @@
+
+#go-admin:hover {
+    background-color: rgb(187, 0, 0);
+    color: white;
+}
+
+
+#a-home:hover {
+    background-color: rgb(80, 80, 80);
+    color: white;
+}
+
+#back-home:hover {
+    background-color: rgb(0, 81, 255);
+    color: white;
+}

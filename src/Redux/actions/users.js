@@ -4,8 +4,10 @@ import {    GET_USERS_LOADING,
             GET_USERS_ERROR,
             EDIT_USER_LOADING,
             EDIT_USER_ERROR,
+            EDIT_USER_SUCCESS,
             DELETE_USER_LOADING,
             DELETE_USER_ERROR,
+            DELETE_USER_SUCCESS,
             REMOVE_ALL_USERS } from '../Constantes'
 
 const {REACT_APP_AGCV_API_URL} = process.env
@@ -59,6 +61,12 @@ const deleteUserError = error => {
     }
 }
 
+const deleteUserSuccess = () => {
+    return {
+        type: DELETE_USER_SUCCESS
+    }
+}
+
 
 //En attente de réponse de l'API
 const editUserLoading = () => {
@@ -72,6 +80,22 @@ const editUserError = error => {
     return {
         type: EDIT_USER_ERROR,     
         payload: error
+    }
+}
+
+const editUserSuccess = () => {
+    return {
+        type: EDIT_USER_SUCCESS
+    }
+}
+
+
+
+//mise à jour de la liste des type tubes
+export const refreshAllUsers = token => {
+    return dispatch => {
+        dispatch(initUsers())
+        dispatch(getAllUsers(token))
     }
 }
 
@@ -96,12 +120,15 @@ export const editUser = (token, userData) => {
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(() => {
-            dispatch(initUsers())
-            dispatch(getAllUsers(token))
+            dispatch(editUserSuccess())
         })
         .catch(res => {
             dispatch(editUserError(res.response.data.message))
         })
+        .catch(err => {
+            dispatch(editUserError(err))
+        })
+        
 
     }
 }
@@ -120,11 +147,13 @@ export const deleteUser = (token, id) => {
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(() => {
-            dispatch(initUsers())
-            dispatch(getAllUsers(token))
+            dispatch(deleteUserSuccess())
         })
         .catch(res => {
             dispatch(deleteUserError(res.response.data.message))
+        })
+        .catch(err => {
+            dispatch(deleteUserError(err))
         })
 
     }
@@ -159,6 +188,9 @@ export const getAllUsers = token => {
         })
         .catch(res => {
             dispatch(getUsersError(res.response.data.message))
+        })
+        .catch(err => {
+            dispatch(getUsersError(err))
         })
 
     }

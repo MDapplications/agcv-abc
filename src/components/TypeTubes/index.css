@@ -1,0 +1,9 @@
+tr#row-typetubes.active {
+    background: #f5f5f5!important;
+}
+
+td#cell-typetubes {
+    border-bottom: none!important;
+    border-style: solid;
+    border-color: #2185d073!important;
+}
