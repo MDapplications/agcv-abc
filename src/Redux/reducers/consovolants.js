@@ -1,9 +1,6 @@
 import {    GET_CONSOVOLANTS_LOADING,
             GET_CONSOVOLANTS_SUCCESS,
             GET_CONSOVOLANTS_ERROR,
-            CREATE_CONSOVOLANT_LOADING,
-            CREATE_CONSOVOLANT_ERROR,
-            CREATE_CONSOVOLANT_SUCCESS,
             UPDATE_CONSOVOLANT_LOADING,
             UPDATE_CONSOVOLANT_ERROR,
             UPDATE_CONSOVOLANT_SUCCESS,
@@ -15,18 +12,19 @@ import {    GET_CONSOVOLANTS_LOADING,
 
 const initialState = {
     isLoading: false,
-    isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
-    isCreateSuccess: false,
+    isGetSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
     consovolants: [],
     error: '',
-    errorCreate: '',
     errorDelete: '',
     errorEdit: ''
 }
+
+
+
 
 
 //reducer
@@ -39,6 +37,7 @@ const reducerConsoVolants = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: true,
+                isGetSuccess: false,
                 consovolants: [],
                 error: ''
             }
@@ -47,6 +46,7 @@ const reducerConsoVolants = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: true,
                 consovolants: action.payload,
                 error: ''
             }
@@ -55,32 +55,9 @@ const reducerConsoVolants = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: false,
                 consovolants: [],
                 error: action.payload
-            }
-
-        //CREATE
-        case CREATE_CONSOVOLANT_LOADING:
-            return {
-                ...state,
-                isLoadingCreate: true,
-                isCreateSuccess: false,
-                errorCreate: ''
-            }
-
-        case CREATE_CONSOVOLANT_ERROR:
-            return {
-                ...state,
-                isLoadingCreate: false,
-                errorCreate: action.payload
-            }
-
-
-        case CREATE_CONSOVOLANT_SUCCESS:
-            return {
-                ...state,
-                isLoadingCreate: false,
-                isCreateSuccess: true
             }
 
         //DELETE

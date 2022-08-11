@@ -2,9 +2,6 @@ import axios from 'axios'
 import {    GET_CONSOVOLANTS_LOADING,
             GET_CONSOVOLANTS_SUCCESS,
             GET_CONSOVOLANTS_ERROR,
-            CREATE_CONSOVOLANT_LOADING,
-            CREATE_CONSOVOLANT_ERROR,
-            CREATE_CONSOVOLANT_SUCCESS,
             UPDATE_CONSOVOLANT_LOADING,
             UPDATE_CONSOVOLANT_ERROR,
             UPDATE_CONSOVOLANT_SUCCESS,
@@ -14,7 +11,6 @@ import {    GET_CONSOVOLANTS_LOADING,
             REMOVE_ALL_CONSOVOLANTS} from '../Constantes'
 
 const {REACT_APP_AGCV_API_URL} = process.env
-
 
 
 //réinitialisation de la liste des utilisateurs
@@ -46,29 +42,6 @@ const getConsoVolantsError = error => {
     return {
         type: GET_CONSOVOLANTS_ERROR,     
         payload: error
-    }
-}
-
-
-//En attente de réponse de l'API
-const createConsoVolantLoading = () => {
-    return {
-        type: CREATE_CONSOVOLANT_LOADING
-    }
-}
-
-//Réponse d'erreur
-const createConsoVolantError = error => {
-    return {
-        type: CREATE_CONSOVOLANT_ERROR,     
-        payload: error
-    }
-}
-
-//Réponse success
-const createConsoVolantSuccess = () => {
-    return {
-        type: CREATE_CONSOVOLANT_SUCCESS
     }
 }
 
@@ -133,41 +106,6 @@ export const refreshAllConsoVolants = token => {
 
 
 
-//Dispatch des actions lors de la création d'un consovolant
-export const createConsoVolant = (token, data) => {
-    return dispatch => {
-        
-        const {stock, idSaison, idTypeTube} = data
-
-        dispatch(createConsoVolantLoading())
-
-        axios.post(
-            `${REACT_APP_AGCV_API_URL}/consovolants`,
-            {   
-                stock, 
-                idSaison,
-                idTypeTube
-            },
-            { headers: { "Authorization": `Bearer ${token}` } }
-        )
-        .then(() => {
-            dispatch(createConsoVolantSuccess())
-        })
-        .catch(res => {
-            dispatch(createConsoVolantError(res.response.data.message))
-        })
-        .catch(err => {
-            dispatch(createConsoVolantError(err))
-        })
-
-    }
-}
-
-
-
-
-
-
 //Dispatch des actions lors de l'update d'un consovolant
 export const editConsoVolant = (token, data) => {
     return dispatch => {
@@ -184,11 +122,12 @@ export const editConsoVolant = (token, data) => {
         .then(() => {
             dispatch(editConsoVolantSuccess())
         })
-        .catch(res => {
-            dispatch(editConsoVolantError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(editConsoVolantError(err))
+            try {
+                dispatch(editConsoVolantError(err.response.data.message))
+            } catch(_) {
+                dispatch(editConsoVolantError(err))
+            }
         })
 
     }
@@ -210,28 +149,27 @@ export const deleteConsoVolant = (token, id) => {
         .then(() => {
             dispatch(deleteConsoVolantSuccess())
         })
-        .catch(res => {
-            dispatch(deleteConsoVolantError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteConsoVolantError(err))
+            try {
+                dispatch(deleteConsoVolantError(err.response.data.message))
+            } catch (_) {
+                dispatch(deleteConsoVolantError(err))
+            }
         })
 
     }
 }
 
 
+const listMois = ['Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin']
 
-
-
-
-export const getAllConsoVolants = token => {
+export const getAllConsoVolants = (token, idSaison) => {
     return dispatch => {
 
         dispatch(getConsoVolantsLoading())
 
         axios.get(
-            `${REACT_APP_AGCV_API_URL}/consovolants`,
+            `${REACT_APP_AGCV_API_URL}/consovolants?idSaison=${idSaison}`,
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(res => {
@@ -243,16 +181,18 @@ export const getAllConsoVolants = token => {
                     idSaison: consovolant.idSaison,
                     idTypeTube: consovolant.idTypeTube,
                     dateCreation: consovolant.dateCreation,
-                    horodatage: consovolant.horodatage
+                    horodatage: consovolant.horodatage,
+                    ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name))
                 })
             })
             dispatch(getConsoVolantsSuccess(listConsoVolants))
         })
-        .catch(res => {
-            dispatch(getConsoVolantsError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(getConsoVolantsError(err))
+            try {
+                dispatch(getConsoVolantsError(err.response.data.message))
+            } catch (_) {
+                dispatch(getConsoVolantsError(err))
+            } 
         })
 
     }

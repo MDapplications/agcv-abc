@@ -7,6 +7,7 @@ import { getUser } from '../../Redux/actions/user'
 import AlertDanger from '../AlertDanger'
 import toast from 'react-hot-toast'
 import { initPage } from '../../Redux/actions/pages'
+import { initStocks } from '../../Redux/actions/stocks'
 
 
 const Login = () => {
@@ -63,6 +64,7 @@ const Login = () => {
                 token: res.data.token
             }
             dispatch(getUser(dataUser))
+            dispatch(initStocks())
             navigate("/home")
             setLoginData(data)
         })

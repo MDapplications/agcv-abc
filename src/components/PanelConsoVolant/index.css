@@ -1,0 +1,60 @@
+#th-mois {
+    background-color: #0d6bf5;
+    color: white;
+}
+
+#td-mois {
+    background-color: white;
+}
+#td-mois.prix {
+    cursor: pointer;
+}
+#td-mois.nbTubesUsed {
+    cursor: pointer;
+}
+#td-mois.nbTubesOrdered {
+    cursor: pointer;
+}
+
+#th-ucp {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background-color: rgb(235, 235, 235);
+}
+
+#th-nb-cout {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background-color: #0d6bf5;
+    color: white;
+}
+
+#tr-header {
+    opacity: 0;
+    border-top: transparent;
+    border-left: transparent;
+    border-right: transparent;
+}
+
+#td-mois{
+    padding-top: 7px;
+    padding-bottom: 7px; 
+}
+
+
+.pop-prix {
+    width: 320px;
+}
+
+
+#th-total-uc {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background-color: white;
+}
+
+#th-total-prix {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background-color: rgb(219, 219, 219);
+}

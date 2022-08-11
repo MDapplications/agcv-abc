@@ -155,17 +155,16 @@ export const createTypetube = (token, data) => {
         .then(() => {
             dispatch(createTypetubeSuccess())
         })
-        .catch(res => {
-            dispatch(createTypetubeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(createTypetubeError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(createTypetubeError(err.response.data.message))
+            } else {
+                dispatch(createTypetubeError(err))
+            }
         })
 
     }
 }
-
-
 
 
 
@@ -192,11 +191,12 @@ export const editTypetube = (token, data) => {
         .then(() => {
             dispatch(editTypetubeSuccess())
         })
-        .catch(res => {
-            dispatch(editTypetubeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(editTypetubeError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(editTypetubeError(err.response.data.message))
+            } else {
+                dispatch(editTypetubeError(err))
+            }
         })
 
     }
@@ -218,11 +218,12 @@ export const deleteTypetube = (token, id) => {
         .then(() => {
             dispatch(deleteTypetubeSuccess())
         })
-        .catch(res => {
-            dispatch(deleteTypetubeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteTypetubeError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(deleteTypetubeError(err.response.data.message))
+            } else {
+                dispatch(deleteTypetubeError(err))
+            }
         })
 
     }
@@ -258,11 +259,12 @@ export const getAllTypetubes = token => {
             })
             dispatch(getTypetubesSuccess(listTypetubes))
         })
-        .catch(res => {
-            dispatch(getTypetubesError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(getTypetubesError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(getTypetubesError(err.response.data.message))
+            } else {
+                dispatch(getTypetubesError(err))
+            }
         })
 
     }

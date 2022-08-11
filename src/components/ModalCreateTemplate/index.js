@@ -34,6 +34,7 @@ const ModalCreateTemplate = ({  hideModal,
             dispatch(actionRefreshData())
             hideModal()
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isCreateSuccess])
     
 

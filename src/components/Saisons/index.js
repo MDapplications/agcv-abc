@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Container, Table } from 'react-bootstrap'
+import { Button, Container } from 'react-bootstrap'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
-import { Icon, Popup } from 'semantic-ui-react'
+import { Icon, Popup, Table } from 'semantic-ui-react'
 import { getPage } from '../../Redux/actions/pages'
 import { deleteSaison, getAllSaisons, refreshAllSaisons } from '../../Redux/actions/saisons'
 import AlertDanger from '../AlertDanger'
@@ -22,6 +22,7 @@ const Saisons = () => {
     //Redux
     const user = useSelector(state => state.user)
     const listSaisons = useSelector(state => state.saisons)
+    const listTypetubes = useSelector(state => state.typetubes)
 
 
     //States
@@ -147,9 +148,9 @@ const Saisons = () => {
     const displayData = listSaisons.saisons.map(data => {
         return (
             <Table.Row id='row-saisons' key={data.id} active>
-                <Table.Cell id='cell-saisons' className='align-middle' textAlign='left'>{`${data.anneeDebut} - ${data.anneeFin}`}</Table.Cell>
+                <Table.Cell id='cell-saisons' className='align-middle' textAlign='left'>{data.anneeDebut + ' - ' + data.anneeFin}</Table.Cell>
                 <Table.Cell id='cell-saisons' className='align-middle' textAlign='center'>{currencyLocalPrice(data.budget)}</Table.Cell>
-                <Table.Cell id='cell-saisons' className='align-middle' textAlign='center'>{new Date(data.horodatage).toLocaleString()}</Table.Cell>
+                <Table.Cell id='cell-saisons' className='align-middle' textAlign='right'>{new Date(data.horodatage).toLocaleString()}</Table.Cell>
                 <Table.Cell id='cell-saisons' className='align-middle' textAlign='center'>{displayBoolean(data.active)}</Table.Cell>
                 <Table.Cell id='cell-saisons' className='align-middle' textAlign='center'>{displayAction(data)}</Table.Cell>
             </Table.Row>
@@ -161,9 +162,9 @@ const Saisons = () => {
     ?   <Table className='mt-4' color='blue' inverted>
             <Table.Header>
                 <Table.Row>
-                    <Table.HeaderCell collapsing style={{width: '200px'}}>Saison</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '110px'}}>Budget</Table.HeaderCell>
-                    <Table.HeaderCell textAlign='rigth'>horodatage</Table.HeaderCell>
+                    <Table.HeaderCell collapsing style={{width: '120px'}}>Saison</Table.HeaderCell>
+                    <Table.HeaderCell collapsing textAlign='center' style={{width: '100px'}}>Budget</Table.HeaderCell>
+                    <Table.HeaderCell textAlign='right'>horodatage</Table.HeaderCell>
                     <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Active</Table.HeaderCell>
                     <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actions</Table.HeaderCell>
                 </Table.Row>
@@ -198,6 +199,14 @@ const Saisons = () => {
     }
 
     const showModalCreate = () => setOpenModalCreate(true)
+
+
+    const loaderTypeTubes = listTypetubes.isLoading
+    ? <Button className='me-2' disabled><Icon name='plus'/> Saison</Button>
+    : listTypetubes.error !== '' ? <Button className='me-2' disabled><Icon name='plus'/> Saison</Button>
+    : <Button className='me-2' onClick={showModalCreate}><Icon name='plus'/> Saison</Button>
+
+
 
     //Modal de creation d'un saison
     const displayModalCreate = openModalCreate && <ModalCreateSaison hideModal={hideModal}/>
@@ -255,11 +264,11 @@ const Saisons = () => {
                             <div className='display-6'>Gestion des saisons</div>
                             <hr/>
                             <div className='d-flex justify-content-start'>
-                                <Button className='me-2' onClick={showModalCreate}><Icon name='plus'/> Saison</Button>
+                                {loaderTypeTubes}
                             </div>
                         </Container>
                     </div>
-                    </main>
+                </main>
   
                 {loaderSaisons}
                     

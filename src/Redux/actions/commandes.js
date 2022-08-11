@@ -123,10 +123,10 @@ const editCommandeSuccess = () => {
 
 
 //mise à jour de la liste des type tubes
-export const refreshAllCommandes = token => {
+export const refreshAllCommandes = (token, idSaison) => {
     return dispatch => {
         dispatch(initCommandes())
-        dispatch(getAllCommandes(token))
+        dispatch(getAllCommandes(token, idSaison))
     }
 }
 
@@ -136,7 +136,7 @@ export const refreshAllCommandes = token => {
 export const createCommande = (token, data) => {
     return dispatch => {
         
-        const {nbTubesOrdered, status, idSaison, idConsoMois, idPrixTube} = data
+        const {nbTubesOrdered, status, idSaison, idConsoMois, idPrixTube, idMembre} = data
 
         dispatch(createCommandeLoading())
 
@@ -148,17 +148,19 @@ export const createCommande = (token, data) => {
                 idSaison,
                 idConsoMois,
                 idPrixTube,
+                idMembre
             },
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(() => {
             dispatch(createCommandeSuccess())
         })
-        .catch(res => {
-            dispatch(createCommandeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(createCommandeError(err))
+            try {
+                dispatch(createCommandeError(err.response.data.message))
+            } catch (error) {
+                dispatch(createCommandeError(err))
+            }
         })
 
     }
@@ -188,11 +190,12 @@ export const editCommande = (token, data) => {
         .then(() => {
             dispatch(editCommandeSuccess())
         })
-        .catch(res => {
-            dispatch(editCommandeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(editCommandeError(err))
+            try {
+                dispatch(editCommandeError(err.response.data.message))
+            } catch (error) {
+                dispatch(editCommandeError(err))
+            }
         })
 
     }
@@ -214,28 +217,25 @@ export const deleteCommande = (token, id) => {
         .then(() => {
             dispatch(deleteCommandeSuccess())
         })
-        .catch(res => {
-            dispatch(deleteCommandeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteCommandeError(err))
+            try {
+                dispatch(deleteCommandeError(err.response.data.message))
+            } catch (error) {
+                dispatch(deleteCommandeError(err))
+            }
         })
-
     }
 }
 
 
 
-
-
-
-export const getAllCommandes = token => {
+export const getAllCommandes = (token, idSaison) => {
     return dispatch => {
 
         dispatch(getCommandesLoading())
 
         axios.get(
-            `${REACT_APP_AGCV_API_URL}/commandes`,
+            `${REACT_APP_AGCV_API_URL}/commandes?idSaison=${idSaison}`,
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(res => {
@@ -254,11 +254,12 @@ export const getAllCommandes = token => {
             })
             dispatch(getCommandesSuccess(listCommandes))
         })
-        .catch(res => {
-            dispatch(getCommandesError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(getCommandesError(err))
+            try {
+                dispatch(getCommandesError(err.response.data.message))
+            } catch (error) {
+                dispatch(getCommandesError(err))
+            }
         })
 
     }

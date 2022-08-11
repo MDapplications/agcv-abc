@@ -45,6 +45,7 @@ const ModalEditTemplate = ({hideModal,
 
             hideModal()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEditSuccess])
 
 

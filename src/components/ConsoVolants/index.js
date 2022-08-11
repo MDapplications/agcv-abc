@@ -1,20 +1,79 @@
 import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { Container, Row } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
 import { getPage } from '../../Redux/actions/pages'
+import Loader from '../Loader'
+import PanelMois from '../PanelMois'
+import PanelConsoVolant from '../PanelConsoVolant'
+
 
 const ConsoVolants = () => {
 
-  //Hooks
-  const dispatch = useDispatch()
+    //Styles
+    const styleStock = {
+        textAlign: 'left',
+        fontSize: '1.2rem'
+    }
+    
+    //Hooks
+    const dispatch = useDispatch()
+
+    //Redux
+    const page = useSelector(state => state.page)
+    const {consovolants} = useSelector(state => state.consovolants)
+    const {typetubes} = useSelector(state => state.typetubes)
 
 
-  useEffect(() => {
-    dispatch(getPage('consoVolants'))
-  }, [dispatch])
+    useEffect(() => {if (page !== 'consoVolants') dispatch(getPage('consoVolants'))}, [dispatch, page])
+
+
+    const getNameTypeTube = id => {
+        const typetube = typetubes.filter(data => data.id === id)
+        if (typetube.length > 0) {
+            return typetube[0].name
+        } else {
+            return 'non défini'
+        }
+    }
+
+
+    const getDefaultTypeTube = id => {
+        const typetube = typetubes.filter(data => data.id === id)
+        if (typetube.length > 0) {
+        return typetube[0].default
+        } else {
+            return false
+        }
+    }
+  
+  
+  const displayConsoVolants = consovolants.length !== 0 ? 
+    consovolants.map(consovolant => {
+      if (getDefaultTypeTube(consovolant.idTypeTube)) {
+        return <PanelConsoVolant 
+            key={consovolant.id}
+            nameTypeTube={getNameTypeTube(consovolant.idTypeTube)}
+            consovolant={consovolant}
+            styleStock={styleStock}
+          />
+      }
+      return null
+    })
+    : <Loader loadingMsg='Actualisation des données...'/>
 
 
   return (
-    <div>ConsoVolants</div>
+    <div className='d-flex justify-content-center'>
+      
+      <PanelMois styleStock={styleStock}/>
+
+      <Container className='mt-3 ms-1 mb-5'>
+        <Row>
+          {displayConsoVolants}
+        </Row>
+      </Container>
+    </div>
+    
   )
 }
 

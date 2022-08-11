@@ -1,29 +1,38 @@
 import {    GET_SAISONS_LOADING,
             GET_SAISONS_SUCCESS,
             GET_SAISONS_ERROR,
+            GET_SAISON_ACTIVE_LOADING,
+            GET_SAISON_ACTIVE_SUCCESS,
+            GET_SAISON_ACTIVE_ERROR,
             CREATE_SAISON_LOADING,
             CREATE_SAISON_ERROR,
             CREATE_SAISON_SUCCESS,
+            CREATE_SAISON_CONSOVOLANT_ERROR,
+            CREATE_SAISON_CONSOMOIS_ERROR,
             UPDATE_SAISON_LOADING,
             UPDATE_SAISON_ERROR,
             UPDATE_SAISON_SUCCESS,
             DELETE_SAISON_LOADING,
             DELETE_SAISON_ERROR,
             DELETE_SAISON_SUCCESS,
+            REMOVE_SAISON_ACTIVE,
             REMOVE_ALL_SAISONS} from '../Constantes'
 
 
 const initialState = {
     isLoading: false,
+    isLoadingGetActive: false,
     isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
+    isGetSaisonActiveSuccess: false,
     isCreateSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
-    saisonActuelle: {},
+    saisonActive: {},
     saisons: [],
     error: '',
+    errorGetActive: '',
     errorCreate: '',
     errorDelete: '',
     errorEdit: ''
@@ -60,6 +69,35 @@ const reducerSaisons = (state=initialState, action) => {
                 error: action.payload
             }
 
+        //GET ACTIVE
+        case GET_SAISON_ACTIVE_LOADING:
+            return {
+                ...state,
+                isLoadingGetActive: true,
+                isGetSaisonActiveSuccess: false,
+                saisonActive: {},
+                errorGetActive: ''
+            }
+
+        case GET_SAISON_ACTIVE_SUCCESS:
+            return {
+                ...state,
+                isLoadingGetActive: false,
+                isGetSaisonActiveSuccess: true,
+                saisonActive: action.payload,
+                errorGetActive: ''
+            }
+
+        case GET_SAISON_ACTIVE_ERROR:
+            return {
+                ...state,
+                isLoadingGetActive: false,
+                isGetSaisonActiveSuccess: false,
+                saisonActive: {},
+                errorGetActive: action.payload
+            }
+
+
         //CREATE
         case CREATE_SAISON_LOADING:
             return {
@@ -82,6 +120,20 @@ const reducerSaisons = (state=initialState, action) => {
                 ...state,
                 isLoadingCreate: false,
                 isCreateSuccess: true
+            }
+
+        case CREATE_SAISON_CONSOVOLANT_ERROR:
+            return {
+                ...state,
+                isLoadingCreate: false,
+                errorCreate: action.payload
+            }
+
+        case CREATE_SAISON_CONSOMOIS_ERROR:
+            return {
+                ...state,
+                isLoadingCreate: false,
+                errorCreate: action.payload
             }
 
         //DELETE
@@ -128,6 +180,14 @@ const reducerSaisons = (state=initialState, action) => {
                 ...state,
                 isLoadingEdit: false,
                 isEditSuccess: true
+            }
+
+        case REMOVE_SAISON_ACTIVE:
+            return {
+                ...state,
+                isLoadingGetActive: false,
+                saisonActive: {},
+                errorGetActive: ''
             }
 
         //REMOVE_ALL

@@ -27,6 +27,7 @@ const ModalTemplate = ({hideModal,
         if (captionBtnBack !== undefined) {
             setCaptionBack(captionBtnBack)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [captionBtnBack])
 
 
@@ -36,6 +37,7 @@ const ModalTemplate = ({hideModal,
         } else {
             setButtonConfirm(<Button variant='success' onClick={handleConfirm}>{captionConfirm}</Button>)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [btnConfirm])
 
 

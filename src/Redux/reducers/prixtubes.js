@@ -19,6 +19,7 @@ const initialState = {
     isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
+    isGetSuccess: false,
     isCreateSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
@@ -40,6 +41,7 @@ const reducerPrixtubes = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: true,
+                isGetSuccess: false,
                 prixtubes: [],
                 error: ''
             }
@@ -48,6 +50,7 @@ const reducerPrixtubes = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: true,
                 prixtubes: action.payload,
                 error: ''
             }
@@ -56,6 +59,7 @@ const reducerPrixtubes = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: false,
                 prixtubes: [],
                 error: action.payload
             }

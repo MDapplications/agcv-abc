@@ -19,9 +19,12 @@ const Header = () => {
     //retour page de connexion si absence de compte utilisateur connecté
     useEffect(() => {
         if (page !== ('')) {
-            if (token === '') navigate('/')
+            if (token === '') {
+                console.log("perte du jeton d'authentification ou déconnexion.")
+                navigate('/')
+            }
         }
-    }, [token, navigate])
+    }, [token, navigate, page])
 
 
     //render

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
-import { Container } from 'react-bootstrap'
-import { useDispatch } from 'react-redux'
+import { Card, Container } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
 import { getPage } from '../../Redux/actions/pages'
 
 const ApercuGlobal = () => {
@@ -8,10 +8,18 @@ const ApercuGlobal = () => {
     //Hooks
     const dispatch = useDispatch()
 
+    //Redux
+    const {saisonActive} = useSelector(state => state.saisons)
 
     useEffect(() => {
         dispatch(getPage('superAdmin'))
     }, [dispatch])
+
+
+    //Affichage au format prix
+    const currencyLocalPrice = prix => {
+        return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(prix)
+    }
 
 
     //render
@@ -25,16 +33,21 @@ const ApercuGlobal = () => {
                         </Container>
                     </div>
                 </main>
+
                 <Container className='mt-5'>
-                    
+                    <Card bg='secondary' key='Secondary' text='white'>
+                        <Card.Body>
+                            <Card.Title>
+                                Saison en cours : {saisonActive.anneeDebut + ' - ' + saisonActive.anneeFin}
+                            </Card.Title>
+                            <Card.Text>
+                                Budget : {currencyLocalPrice(saisonActive.budget)}
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
                 </Container>
                 
             </Container>
-
-            {/*         
-            {displayModalDelete}
-            {displayModalEdit} 
-            */}
     </>
     )
 }

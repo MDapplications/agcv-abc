@@ -153,13 +153,13 @@ export const createPrixtube = (token, data) => {
         .then(() => {
             dispatch(createPrixtubeSuccess())
         })
-        .catch(res => {
-            dispatch(createPrixtubeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(createPrixtubeError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(createPrixtubeError(err.response.data.message))
+            } else {
+                dispatch(createPrixtubeError(err))
+            }
         })
-
     }
 }
 
@@ -189,13 +189,13 @@ export const editPrixtube = (token, data) => {
         .then(() => {
             dispatch(editPrixtubeSuccess())
         })
-        .catch(res => {
-            dispatch(editPrixtubeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(editPrixtubeError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(editPrixtubeError(err.response.data.message))
+            } else {
+                dispatch(editPrixtubeError(err))
+            }
         })
-
     }
 }
 
@@ -215,17 +215,16 @@ export const deletePrixtube = (token, id) => {
         .then(() => {
             dispatch(deletePrixtubeSuccess())
         })
-        .catch(res => {
-            dispatch(deletePrixtubeError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deletePrixtubeError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(deletePrixtubeError(err.response.data.message))
+            } else {
+                dispatch(deletePrixtubeError(err))
+            }
         })
 
     }
 }
-
-
 
 
 
@@ -255,11 +254,12 @@ export const getAllPrixtubes = token => {
             })
             dispatch(getPrixtubesSuccess(listPrixtubes))
         })
-        .catch(res => {
-            dispatch(getPrixtubesError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(getPrixtubesError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(getPrixtubesError(err.response.data.message))
+            } else {
+                dispatch(getPrixtubesError(err))
+            }
         })
 
     }

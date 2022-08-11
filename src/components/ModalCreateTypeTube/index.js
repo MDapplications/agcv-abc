@@ -33,6 +33,7 @@ const ModalCreateTypeTube = ({hideModal}) => {
 
     useEffect(() => {
         settypeTubeCreate({...typeTubeCreate, name: getNameByType(type)})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type])
     
 

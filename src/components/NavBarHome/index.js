@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Container, Nav, Navbar } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import BtnLogout from '../BtnLogout'

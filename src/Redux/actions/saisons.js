@@ -2,26 +2,39 @@ import axios from 'axios'
 import {    GET_SAISONS_LOADING,
             GET_SAISONS_SUCCESS,
             GET_SAISONS_ERROR,
+            GET_SAISON_ACTIVE_LOADING,
+            GET_SAISON_ACTIVE_SUCCESS,
+            GET_SAISON_ACTIVE_ERROR,
             CREATE_SAISON_LOADING,
             CREATE_SAISON_ERROR,
             CREATE_SAISON_SUCCESS,
+            CREATE_SAISON_CONSOVOLANT_ERROR,
+            CREATE_SAISON_CONSOMOIS_ERROR,
             UPDATE_SAISON_LOADING,
             UPDATE_SAISON_ERROR,
             UPDATE_SAISON_SUCCESS,
             DELETE_SAISON_LOADING,
             DELETE_SAISON_ERROR,
             DELETE_SAISON_SUCCESS,
+            REMOVE_SAISON_ACTIVE,
             REMOVE_ALL_SAISONS} from '../Constantes'
 
 const {REACT_APP_AGCV_API_URL} = process.env
+const listMois = ['Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin']
 
 
 
-
-//réinitialisation de la liste des utilisateurs
+//réinitialisation de la liste des saisons
 export const initSaisons = () => {
     return {
         type: REMOVE_ALL_SAISONS
+    }
+}
+
+//réinitialisation de la saison active
+export const initSaisonActive = () => {
+    return {
+        type: REMOVE_SAISON_ACTIVE
     }
 }
 
@@ -52,6 +65,29 @@ const getSaisonsError = error => {
 
 
 //En attente de réponse de l'API
+const getSaisonActiveLoading = () => {
+    return {
+        type: GET_SAISON_ACTIVE_LOADING
+    }
+}
+
+//Réponse reçu
+const getSaisonActiveSuccess = data => {
+    return {
+        type: GET_SAISON_ACTIVE_SUCCESS,     
+        payload: data  
+    }
+}
+
+//Réponse d'erreur
+const getSaisonActiveError = error => {
+    return {
+        type: GET_SAISON_ACTIVE_ERROR,     
+        payload: error
+    }
+}
+
+//En attente de réponse de l'API
 const createSaisonLoading = () => {
     return {
         type: CREATE_SAISON_LOADING
@@ -73,6 +109,22 @@ const createSaisonSuccess = () => {
     }
 }
 
+
+//Réponse d'erreur
+const createConsoVolantError = error => {
+    return {
+        type: CREATE_SAISON_CONSOVOLANT_ERROR,     
+        payload: error
+    }
+}
+
+//Réponse d'erreur
+const createConsoMoisError = error => {
+    return {
+        type: CREATE_SAISON_CONSOMOIS_ERROR,     
+        payload: error
+    }
+}
 
 //En attente de réponse de l'API
 const deleteSaisonLoading = () => {
@@ -134,35 +186,117 @@ export const refreshAllSaisons = token => {
 
 
 
-//Dispatch des actions lors de la création d'un saison
-export const createSaison = (token, data) => {
+
+
+//Dispatch des actions lors de la création d'un consomois
+export const createConsoMois = (token, data) => {
     return dispatch => {
         
-        const {name, comment, orderable, lowLevel} = data
+        const {name, nbTubesUsed, nbTubesOrdered, idConsoVolant, idPrixTube} = data
+
+        axios.post(
+            `${REACT_APP_AGCV_API_URL}/consomois`,
+            {   
+                name,
+                nbTubesUsed,
+                nbTubesOrdered,
+                idConsoVolant,
+                idPrixTube,
+            },
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .catch(err => {
+            try {
+                dispatch(createConsoMoisError(err.response.data.message))
+            } catch (error) {
+                dispatch(createConsoMoisError(err))
+            }
+        })
+
+    }
+}
+
+
+
+
+
+//Dispatch des actions lors de la création d'un consovolant
+export const createConsoVolant = (token, data) => {
+    return dispatch => {
+        
+        const {stock, idSaison, idTypeTube} = data
+
+        axios.post(
+            `${REACT_APP_AGCV_API_URL}/consovolants`,
+            {   
+                stock, 
+                idSaison,
+                idTypeTube
+            },
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(res => {
+            const idConsoVolant = res.data.data.id
+            listMois.forEach(mois => {
+                const consoMoisData = {
+                    name: mois,
+                    nbTubesUsed: 0,
+                    nbTubesOrdered: 0,
+                    idConsoVolant,
+                    idPrixTube: 0
+                }
+                dispatch(createConsoMois(token, consoMoisData))
+            })
+        })
+        .catch(err => {
+            try {
+                dispatch(createConsoVolantError(err.response.data.message))
+            } catch (error) {
+                dispatch(createConsoVolantError(err))
+            }
+        })
+    }
+}
+
+
+
+//Dispatch des actions lors de la création d'un saison
+export const createSaison = (token, data, typetubes) => {
+    return dispatch => {
+        
+        const {anneeDebut, anneeFin, budget, active} = data
 
         dispatch(createSaisonLoading())
 
         axios.post(
             `${REACT_APP_AGCV_API_URL}/saisons`,
             {   
-                name, 
-                comment,
-                orderable,
-                lowLevel,
-                default: data.default
+                anneeDebut, 
+                anneeFin,
+                budget,
+                active
             },
             { headers: { "Authorization": `Bearer ${token}` } }
         )
-        .then(() => {
+        .then(res => {
+            const idSaison = res.data.data.id
+            typetubes.forEach(typetube => {
+                const dataConsoVolant = {
+                    stock: 0,
+                    idSaison,
+                    idTypeTube: typetube.id
+                }
+                dispatch(createConsoVolant(token, dataConsoVolant))
+            })
             dispatch(createSaisonSuccess())
         })
-        .catch(res => {
-            dispatch(createSaisonError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(createSaisonError(err))
+            try {
+                dispatch(createSaisonError(err.response.data.message))
+            } catch (error) {
+                dispatch(createSaisonError(err))
+            }
         })
-
     }
 }
 
@@ -175,15 +309,13 @@ export const createSaison = (token, data) => {
 export const editSaison = (token, data) => {
     return dispatch => {
 
-        const {anneeDebut, anneeFin, budget, active} = data
+        const {budget, active} = data
 
         dispatch(editSaisonLoading())
 
         axios.put(
             `${REACT_APP_AGCV_API_URL}/saisons/${data.id}`,
             {   
-                anneeDebut,
-                anneeFin,
                 budget,
                 active
             },
@@ -192,13 +324,13 @@ export const editSaison = (token, data) => {
         .then(() => {
             dispatch(editSaisonSuccess())
         })
-        .catch(res => {
-            dispatch(editSaisonError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(editSaisonError(err))
+            try {
+                dispatch(editSaisonError(err.response.data.message))
+            } catch (error) {
+                dispatch(editSaisonError(err))
+            }
         })
-
     }
 }
 
@@ -218,18 +350,55 @@ export const deleteSaison = (token, id) => {
         .then(() => {
             dispatch(deleteSaisonSuccess())
         })
-        .catch(res => {
-            dispatch(deleteSaisonError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteSaisonError(err))
+            try {
+                dispatch(deleteSaisonError(err.response.data.message))
+            } catch (error) {
+                dispatch(deleteSaisonError(err))
+            } 
         })
-
     }
 }
 
 
 
+export const getSaisonActive = token => {
+    return dispatch => {
+
+        dispatch(getSaisonActiveLoading())
+
+        axios.get(
+            `${REACT_APP_AGCV_API_URL}/saisons?active=true`,
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(res => {
+            const saisonActive = []
+            res.data.data.forEach(saison => {
+                saisonActive.push({
+                    id: saison.id,
+                    anneeDebut: saison.anneeDebut,
+                    anneeFin: saison.anneeFin,
+                    budget: saison.budget,
+                    active: saison.active,
+                    dateCreation: saison.dateCreation,
+                    horodatage: saison.horodatage,
+                    ConsoVolants: saison.ConsoVolants,
+                    commandes: saison.Commandes,
+                    competitions: saison.Competitions
+                })
+            })
+            dispatch(getSaisonActiveSuccess(saisonActive[0]))
+        })
+        .catch(err => {
+            try {
+                dispatch(getSaisonActiveError(err.response.data.message))
+            } catch (error) {
+                dispatch(getSaisonActiveError(err))
+            } 
+        })
+
+    }
+}
 
 
 
@@ -257,12 +426,12 @@ export const getAllSaisons = token => {
             })
             dispatch(getSaisonsSuccess(listSaisons))
         })
-        .catch(res => {
-            dispatch(getSaisonsError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(getSaisonsError(err))
+            try {
+                dispatch(getSaisonsError(err.response.data.message))
+            } catch (error) {
+                dispatch(getSaisonsError(err))
+            } 
         })
-
     }
 }

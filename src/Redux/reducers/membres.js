@@ -18,6 +18,7 @@ const initialState = {
     isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
+    isGetSuccess: false,
     isCreateSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
@@ -39,6 +40,7 @@ const reducerMembres = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: true,
+                isGetSuccess: false,
                 membres: [],
                 error: ''
             }
@@ -47,6 +49,7 @@ const reducerMembres = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: true,
                 membres: action.payload,
                 error: ''
             }
@@ -55,6 +58,7 @@ const reducerMembres = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: false,
                 membres: [],
                 error: action.payload
             }

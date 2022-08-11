@@ -122,13 +122,14 @@ export const editUser = (token, userData) => {
         .then(() => {
             dispatch(editUserSuccess())
         })
-        .catch(res => {
-            dispatch(editUserError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(editUserError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(editUserError(err.response.data.message))
+            } else {
+                dispatch(editUserError(err))
+            }
         })
-        
+      
 
     }
 }
@@ -149,11 +150,12 @@ export const deleteUser = (token, id) => {
         .then(() => {
             dispatch(deleteUserSuccess())
         })
-        .catch(res => {
-            dispatch(deleteUserError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteUserError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(deleteUserError(err.response.data.message))
+            } else {
+                dispatch(deleteUserError(err))
+            }
         })
 
     }
@@ -172,7 +174,6 @@ export const getAllUsers = token => {
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(res => {
-            //console.log(res)
             const listUsers = []
             res.data.data.forEach(user => {
                 listUsers.push({
@@ -186,11 +187,12 @@ export const getAllUsers = token => {
             })
             dispatch(getUsersSuccess(listUsers))
         })
-        .catch(res => {
-            dispatch(getUsersError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(getUsersError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(getUsersError(err.response.data.message))
+            } else {
+                dispatch(getUsersError(err))
+            }
         })
 
     }

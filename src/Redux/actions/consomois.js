@@ -2,9 +2,6 @@ import axios from 'axios'
 import {    GET_CONSOMOIS_LOADING,
             GET_CONSOMOIS_SUCCESS,
             GET_CONSOMOIS_ERROR,
-            CREATE_CONSOMOIS_LOADING,
-            CREATE_CONSOMOIS_ERROR,
-            CREATE_CONSOMOIS_SUCCESS,
             UPDATE_CONSOMOIS_LOADING,
             UPDATE_CONSOMOIS_ERROR,
             UPDATE_CONSOMOIS_SUCCESS,
@@ -46,29 +43,6 @@ const getConsoMoisError = error => {
     return {
         type: GET_CONSOMOIS_ERROR,     
         payload: error
-    }
-}
-
-
-//En attente de réponse de l'API
-const createConsoMoisLoading = () => {
-    return {
-        type: CREATE_CONSOMOIS_LOADING
-    }
-}
-
-//Réponse d'erreur
-const createConsoMoisError = error => {
-    return {
-        type: CREATE_CONSOMOIS_ERROR,     
-        payload: error
-    }
-}
-
-//Réponse success
-const createConsoMoisSuccess = () => {
-    return {
-        type: CREATE_CONSOMOIS_SUCCESS
     }
 }
 
@@ -132,44 +106,6 @@ export const refreshAllConsoMois = token => {
 }
 
 
-
-//Dispatch des actions lors de la création d'un consomois
-export const createConsoMois = (token, data) => {
-    return dispatch => {
-        
-        const {name, nbTubesUsed, nbTubesOrdered, idConsoVolant, idPrixTube} = data
-
-        dispatch(createConsoMoisLoading())
-
-        axios.post(
-            `${REACT_APP_AGCV_API_URL}/consomois`,
-            {   
-                name,
-                nbTubesUsed,
-                nbTubesOrdered,
-                idConsoVolant,
-                idPrixTube,
-            },
-            { headers: { "Authorization": `Bearer ${token}` } }
-        )
-        .then(() => {
-            dispatch(createConsoMoisSuccess())
-        })
-        .catch(res => {
-            dispatch(createConsoMoisError(res.response.data.message))
-        })
-        .catch(err => {
-            dispatch(createConsoMoisError(err))
-        })
-
-    }
-}
-
-
-
-
-
-
 //Dispatch des actions lors de l'update d'un consomois
 export const editConsoMois = (token, data) => {
     return dispatch => {
@@ -190,11 +126,12 @@ export const editConsoMois = (token, data) => {
         .then(() => {
             dispatch(editConsoMoisSuccess())
         })
-        .catch(res => {
-            dispatch(editConsoMoisError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteConsoMoisError(err))
+            try {
+                dispatch(editConsoMoisError(err.response.data.message))
+            } catch (_) {
+                dispatch(editConsoMoisError(err))
+            }
         })
 
     }
@@ -216,13 +153,13 @@ export const deleteConsoMois = (token, id) => {
         .then(() => {
             dispatch(deleteConsoMoisSuccess())
         })
-        .catch(res => {
-            dispatch(deleteConsoMoisError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteConsoMoisError(err))
+            try {
+                dispatch(deleteConsoMoisError(err.response.data.message))
+            } catch (_) {
+                dispatch(deleteConsoMoisError(err))
+            }
         })
-
     }
 }
 
@@ -231,13 +168,13 @@ export const deleteConsoMois = (token, id) => {
 
 
 
-export const getAllConsoMois = token => {
+export const getAllConsoMois = (token, idConsoVolant) => {
     return dispatch => {
 
         dispatch(getConsoMoisLoading())
 
         axios.get(
-            `${REACT_APP_AGCV_API_URL}/consomois`,
+            `${REACT_APP_AGCV_API_URL}/consomois?idConsoVolant=${idConsoVolant}`,
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(res => {
@@ -251,17 +188,18 @@ export const getAllConsoMois = token => {
                     idConsoVolant: consomois.idConsoVolant,
                     idPrixTube: consomois.idPrixTube,
                     dateCreation: consomois.dateCreation,
-                    horodatage: consomois.horodatage
+                    horodatage: consomois.horodatage,
+                    PrixTubes: consomois.PrixTubes
                 })
             })
             dispatch(getConsoMoisSuccess(listConsoMois))
         })
-        .catch(res => {
-            dispatch(getConsoMoisError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteConsoMoisError(err))
+            try {
+                dispatch(getConsoMoisError(err.response.data.message))
+            } catch (_) {
+                dispatch(getConsoMoisError(err))
+            }
         })
-
     }
 }

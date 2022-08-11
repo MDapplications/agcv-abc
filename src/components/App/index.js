@@ -19,6 +19,8 @@ import ParamSaison from '../ParamSaison'
 import Utilisateurs from '../Utilisateurs'
 import ApercuGlobal from '../ApercuGlobal'
 import TypeTubes from '../TypeTubes'
+import Commandes from '../Commandes'
+import Competitions from '../Competitions'
 
 
 const App = () => {
@@ -31,15 +33,16 @@ const App = () => {
 
           <Route path='/signup' element={<SignUp/>}/>
          
-          <Route path="/histoSaison" element={<HistoSaison/>}/>
+          <Route path="/saison/:anneeDebut" element={<HistoSaison/>}/>
           
           <Route path="/home" element={<Home/>}>
             <Route index element={<ResumeSaison/>}/>
             <Route path="consoVolants" element={<ConsoVolants/>}/>
             <Route path="consoTests" element={<ConsoTests/>}/>
           </Route>
-
-          
+ 
+          <Route path="/commandes/:idSaison" element={<Commandes/>}/>
+          <Route path="/competitions/:idSaison" element={<Competitions/>}/>
 
           <Route path="/admin" element={<Admin/>}>
             <Route index element={<ParamSaison/>}/>

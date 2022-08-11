@@ -121,10 +121,10 @@ const editMembreSuccess = () => {
 
 
 //mise à jour de la liste des type tubes
-export const refreshAllMembres = token => {
+export const refreshAllMembres = (token, actif) => {
     return dispatch => {
         dispatch(initMembres())
-        dispatch(getAllMembres(token))
+        dispatch(getAllMembres(token, actif))
     }
 }
 
@@ -150,13 +150,13 @@ export const createMembre = (token, data) => {
         .then(() => {
             dispatch(createMembreSuccess())
         })
-        .catch(res => {
-            dispatch(createMembreError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteMembreError(err))
+            try {
+                dispatch(createMembreError(err.response.data.message))
+            } catch (error) {
+                dispatch(createMembreError(err))
+            }
         })
-
     }
 }
 
@@ -181,13 +181,13 @@ export const editMembre = (token, data) => {
         .then(() => {
             dispatch(editMembreSuccess())
         })
-        .catch(res => {
-            dispatch(editMembreError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteMembreError(err))
+            try {
+                dispatch(editMembreError(err.response.data.message))
+            } catch (error) {
+                dispatch(editMembreError(err))
+            }
         })
-
     }
 }
 
@@ -207,11 +207,12 @@ export const deleteMembre = (token, id) => {
         .then(() => {
             dispatch(deleteMembreSuccess())
         })
-        .catch(res => {
-            dispatch(deleteMembreError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteMembreError(err))
+            try {
+                dispatch(deleteMembreError(err.response.data.message))
+            } catch (error) {
+                dispatch(deleteMembreError(err))
+            }
         })
 
     }
@@ -222,13 +223,18 @@ export const deleteMembre = (token, id) => {
 
 
 
-export const getAllMembres = token => {
+export const getAllMembres = (token, actif) => {
     return dispatch => {
 
         dispatch(getMembresLoading())
+        let optionActif = ''
+
+        if (actif !== undefined) {
+            optionActif = `?actif=${actif}`
+        }
 
         axios.get(
-            `${REACT_APP_AGCV_API_URL}/membres`,
+            `${REACT_APP_AGCV_API_URL}/membres${optionActif}`,
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(res => {
@@ -245,11 +251,12 @@ export const getAllMembres = token => {
             })
             dispatch(getMembresSuccess(listMembres))
         })
-        .catch(res => {
-            dispatch(getMembresError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteMembreError(err))
+            try {
+                dispatch(getMembresError(err.response.data.message))
+            } catch (error) {
+                dispatch(getMembresError(err))
+            }
         })
 
     }

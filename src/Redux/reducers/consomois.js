@@ -1,9 +1,6 @@
 import {    GET_CONSOMOIS_LOADING,
             GET_CONSOMOIS_SUCCESS,
             GET_CONSOMOIS_ERROR,
-            CREATE_CONSOMOIS_LOADING,
-            CREATE_CONSOMOIS_ERROR,
-            CREATE_CONSOMOIS_SUCCESS,
             UPDATE_CONSOMOIS_LOADING,
             UPDATE_CONSOMOIS_ERROR,
             UPDATE_CONSOMOIS_SUCCESS,
@@ -15,18 +12,24 @@ import {    GET_CONSOMOIS_LOADING,
             
 const initialState = {
     isLoading: false,
-    isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
-    isCreateSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
     consomois: [],
     error: '',
-    errorCreate: '',
     errorDelete: '',
     errorEdit: ''
 }
+
+
+const helperAddConsoMois = (consomois, payload) => {
+    payload.forEach(data => {
+        consomois = [...consomois, data]
+    })
+    return consomois
+}
+
 
 
 //reducer
@@ -39,7 +42,6 @@ const reducerConsoMois = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: true,
-                consomois: [],
                 error: ''
             }
 
@@ -47,7 +49,7 @@ const reducerConsoMois = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
-                consomois: action.payload,
+                consomois: helperAddConsoMois(state.consomois, action.payload),
                 error: ''
             }
 
@@ -57,30 +59,6 @@ const reducerConsoMois = (state=initialState, action) => {
                 isLoading: false,
                 consomois: [],
                 error: action.payload
-            }
-
-        //CREATE
-        case CREATE_CONSOMOIS_LOADING:
-            return {
-                ...state,
-                isLoadingCreate: true,
-                isCreateSuccess: false,
-                errorCreate: ''
-            }
-
-        case CREATE_CONSOMOIS_ERROR:
-            return {
-                ...state,
-                isLoadingCreate: false,
-                errorCreate: action.payload
-            }
-
-
-        case CREATE_CONSOMOIS_SUCCESS:
-            return {
-                ...state,
-                isLoadingCreate: false,
-                isCreateSuccess: true
             }
 
         //DELETE

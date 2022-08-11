@@ -19,6 +19,7 @@ const ModalCreateSaison = ({hideModal}) => {
     //Redux
     const {token} = useSelector(state => state.user)
     const listSaisons = useSelector(state => state.saisons)
+    const listTypetubes = useSelector(state => state.typetubes)
 
 
     //States
@@ -30,6 +31,7 @@ const ModalCreateSaison = ({hideModal}) => {
         setSaisonCreate({...saisonCreate, budget: Number(budgetText)})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+  
 
 
 
@@ -46,7 +48,7 @@ const ModalCreateSaison = ({hideModal}) => {
             styleBody={{width: '700px'}}
             styleAlert={{width: '460px'}}
             stateSelector={listSaisons}
-            actionCreate={() => createSaison(token, saisonCreate)}
+            actionCreate={() => createSaison(token, saisonCreate, listTypetubes.typetubes)}
             actionRefreshData={() => refreshAllSaisons(token)}
             title="Création d'une saison">
 

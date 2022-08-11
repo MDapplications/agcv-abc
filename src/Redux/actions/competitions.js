@@ -154,11 +154,12 @@ export const createCompetition = (token, data) => {
         .then(() => {
             dispatch(createCompetitionSuccess())
         })
-        .catch(res => {
-            dispatch(createCompetitionError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(createCompetitionError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(createCompetitionError(err.response.data.message))
+            } else {
+                dispatch(createCompetitionError(err))
+            }
         })
 
     }
@@ -185,11 +186,12 @@ export const editCompetition = (token, data) => {
         .then(() => {
             dispatch(editCompetitionSuccess())
         })
-        .catch(res => {
-            dispatch(editCompetitionError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteCompetitionError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(editCompetitionError(err.response.data.message))
+            } else {
+                dispatch(editCompetitionError(err))
+            }
         })
 
     }
@@ -211,11 +213,12 @@ export const deleteCompetition = (token, id) => {
         .then(() => {
             dispatch(deleteCompetitionSuccess())
         })
-        .catch(res => {
-            dispatch(deleteCompetitionError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(deleteCompetitionError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(deleteCompetitionError(err.response.data.message))
+            } else {
+                dispatch(deleteCompetitionError(err))
+            }
         })
 
     }
@@ -250,12 +253,12 @@ export const getAllCompetitions = token => {
             })
             dispatch(getCompetitionsSuccess(listCompetitions))
         })
-        .catch(res => {
-            dispatch(getCompetitionsError(res.response.data.message))
-        })
         .catch(err => {
-            dispatch(getCompetitionsError(err))
+            if (err.response.data.message !== undefined) {
+                dispatch(getCompetitionsError(err.response.data.message))
+            } else {
+                dispatch(getCompetitionsError(err))
+            }
         })
-
     }
 }
