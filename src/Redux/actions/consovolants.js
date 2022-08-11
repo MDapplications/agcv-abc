@@ -182,7 +182,8 @@ export const getAllConsoVolants = (token, idSaison) => {
                     idTypeTube: consovolant.idTypeTube,
                     dateCreation: consovolant.dateCreation,
                     horodatage: consovolant.horodatage,
-                    ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name))
+                    ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name)),
+                    TypeTube: consovolant.TypeTube,
                 })
             })
             dispatch(getConsoVolantsSuccess(listConsoVolants))

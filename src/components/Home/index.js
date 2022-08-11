@@ -90,7 +90,7 @@ const Home = () => {
             if (Object.keys(stocksVolants).length === 0) {
                 consovolants.forEach(consovolant => {
                     const idConsoVolant = consovolant.id
-                    const idTypeTube = consovolant.idTypeTube
+                    const TypeTube = consovolant.TypeTube
                     const calculConsoVolant = consovolant.ConsoMois.reduce((prevValue, data) => {
                         return {
                             nbUsed: prevValue.nbUsed + data.nbTubesUsed,
@@ -108,7 +108,7 @@ const Home = () => {
                         priceUsed: Number(calculConsoVolant.priceUsed.toFixed(2)),
                         nbOrdered: calculConsoVolant.nbOrdered,
                         priceOrdered: Number(calculConsoVolant.priceOrdered.toFixed(2)),
-                        idTypeTube: idTypeTube,
+                        TypeTube: TypeTube,
                         stock: stock
                     }))
                 

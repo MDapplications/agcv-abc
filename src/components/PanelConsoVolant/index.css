@@ -15,6 +15,9 @@
 #td-mois.nbTubesOrdered {
     cursor: pointer;
 }
+#td-mois.nbTubesUsed.orderable {
+    cursor: default;
+}
 
 #th-ucp {
     padding-top: 7px;

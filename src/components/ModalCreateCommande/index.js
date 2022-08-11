@@ -11,7 +11,7 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
     const initCommande = {
         nbTubesOrdered: 0,
         status: false,
-        idSaison: Number(idSaison),
+        idSaison,
         idConsoMois: 0,
         idTypeTube: 0,
         idPrixTube: 0,
@@ -113,6 +113,7 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
     const currencyLocalPrice = prix => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(prix)
 
     const handleChange = event => setCommandeCreate({...commandeCreate, [event.target.id]: Number(event.target.value)})
+    const handleChangeSwitch = event => setCommandeCreate({...commandeCreate, [event.target.id]: event.target.checked})
     const handleChangeSelect = event => setCommandeCreate({...commandeCreate, [event.target.id]: Number(event.target.value)})
     const handleChangeSelectMois = event => {
         const dataFilter = consovolant.ConsoMois.filter(data => data.id === Number(event.target.value))
@@ -263,6 +264,23 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
                                 onChange={handleChange}/>
                         </Col>
                     </Row>
+
+                    <Row>
+                        <Col md={md}>
+                            <Form.Label className='mb-1 mt-4'>
+                                Commande réglée ?
+                            </Form.Label>
+                        </Col>
+                        <Col md={md}>
+                            <Form.Check
+                                className='mt-4' 
+                                type="switch"
+                                id="status"
+                                checked={commandeCreate.status}
+                                onChange={handleChangeSwitch}/>
+                        </Col>
+                    </Row>
+
                 </Form.Group>
             </Form>
         </ModalCreateTemplate>

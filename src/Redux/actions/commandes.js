@@ -241,16 +241,7 @@ export const getAllCommandes = (token, idSaison) => {
         .then(res => {
             const listCommandes = []
             res.data.data.forEach(commande => {
-                listCommandes.push({
-                    id: commande.id,
-                    nbTubesOrdered: commande.nbTubesOrdered,
-                    status: commande.status,
-                    idSaison: commande.idSaison,
-                    idConsoMois: commande.idConsoMois,
-                    idPrixTube: commande.idPrixTube,
-                    dateCreation: commande.dateCreation,
-                    horodatage: commande.horodatage
-                })
+                listCommandes.push(commande)
             })
             dispatch(getCommandesSuccess(listCommandes))
         })

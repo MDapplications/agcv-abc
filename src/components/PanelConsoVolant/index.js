@@ -7,12 +7,11 @@ import TableConsoMois from './TableConsoMois'
 import { setStock } from '../../Redux/actions/stocks'
 import './index.css'
 
-const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock}) => {
+const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock, orderable}) => {
 
     //Redux
     const {prixtubes} = useSelector(state => state.prixtubes)
-    const {typetubes} = useSelector(state => state.typetubes)
-
+    
     //States
     const [totalUsed, setTotalUsed] = useState(0)
     const [totalOrdered, setTotalOrdered] = useState(0)
@@ -24,7 +23,7 @@ const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock}) => {
     const dispatch = useDispatch()
 
     
-    const {id, stock, ConsoMois, idTypeTube} = consovolant
+    const {id, stock, ConsoMois, TypeTube} = consovolant
 
 
     useEffect(() => {
@@ -53,7 +52,7 @@ const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock}) => {
             priceUsed: totalPriceUsed,
             nbOrdered: totalOrdered,
             priceOrdered: totalPriceOrdered,
-            idTypeTube: idTypeTube,
+            TypeTube: TypeTube,
             stock: stockVolant
         }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,20 +69,13 @@ const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock}) => {
         }
     }
 
-    const getLowLevel = idTypeTube => {
-        const typetube = typetubes.filter(data => data.id === idTypeTube)
-        if (typetube.length !== 0) {
-            return typetube[0].lowLevel
-        } else {
-            return 0
-        }
-    }
-
-    const activeLowLevel = stockVolant <= getLowLevel(consovolant.idTypeTube)
+    const activeLowLevel = stockVolant <= consovolant.TypeTube.lowLevel
     ? <Badge bg='danger'>Stock bas</Badge>
     : <Badge bg='light' text='white' style={{opacity:'0'}}>Stock bas</Badge>
 
-    const displayConsoMois = consovolant => consovolant.ConsoMois.map(moisData => <TableConsoMois key={moisData.id} moisData={moisData}/>)
+    const displayConsoMois = consovolant => consovolant.ConsoMois.map(moisData => <TableConsoMois   key={moisData.id} 
+                                                                                                    moisData={moisData} 
+                                                                                                    orderable={orderable}/>)
 
     return (
         <Col className='px-1'>

@@ -14,7 +14,6 @@ const ResumeSaison = () => {
     const {saisonActive} = useSelector(state => state.saisons)
 	const stocks = useSelector(state => state.stocks)
 	const page = useSelector(state => state.page)
-	const {typetubes} = useSelector(state => state.typetubes)
 
 
 	useEffect(() => {
@@ -49,31 +48,9 @@ const ResumeSaison = () => {
 
 	const getBudgetRestant = () => saisonActive.budget - getTotalPriceUsed()
 
-
-	const getNameTypeTube = id => {
-        const typetube = typetubes.filter(data => data.id === id)
-        if (typetube.length > 0) {
-            return typetube[0].comment !== '' ? `${typetube[0].name} - ${typetube[0].comment}` : typetube[0].name
-        } else {
-            return 'non défini'
-        }
-    }
-
-	const getLowLevel = idTypeTube => {
-        const typetube = typetubes.filter(data => data.id === idTypeTube)
-        if (typetube.length !== 0) {
-            return typetube[0].lowLevel
-        } else {
-            return 0
-        }
-    }
-
-
 	const handleClickCommandes = (idSaison) => navigate(`/commandes/${idSaison}`)
 
-
-
-    const activeLowLevel = stockVolant => stockVolant.stock <= getLowLevel(stockVolant.idTypeTube)
+    const activeLowLevel = stockVolant => stockVolant.stock <= stockVolant.TypeTube.lowLevel
     ? <Badge bg='danger'>Stock bas</Badge>
     : <Badge bg='light' text='white' style={{opacity:'0'}}>Stock bas</Badge>
 
@@ -81,7 +58,9 @@ const ResumeSaison = () => {
 	const displayResumeConso = stocks.length !== 0 
 	? stocks.map(conso => {
 		return <ListGroup.Item key={conso.id} className='text-start'>
-			<Card.Title>{getNameTypeTube(conso.idTypeTube)}</Card.Title>
+			<Card.Title>
+				{conso.TypeTube.comment !== '' ? `${conso.TypeTube.name} - ${conso.TypeTube.comment}` : conso.TypeTube.name}
+			</Card.Title>
 
 			<div className='mb-1'>
 				<span className='me-3'>Stock :</span>
@@ -96,7 +75,7 @@ const ResumeSaison = () => {
 				<span className='me-3'>Tubes Commandés :</span>
 				<span>{currencyLocalPrice(conso.priceOrdered) + ' (' + conso.nbOrdered  + ')'}</span>
 			</div>
-			
+
 		</ListGroup.Item>
 	})
 	: <ListGroup.Item>Aucune consommation pour cette saison.</ListGroup.Item>
