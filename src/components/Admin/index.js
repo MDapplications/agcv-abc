@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useNavigate } from 'react-router-dom'
+import { getAllTypetubes } from '../../Redux/actions/typetubes'
 import NavBarAdmin from '../NavBarAdmin'
 
 const Admin = () => {
 
     //Redux
-    const {role} = useSelector(state => state.user)
-
+    const {role, token} = useSelector(state => state.user)
+    const {isLoading, isGetSuccess, error} = useSelector(state => state.typetubes)
 
     //Hooks
     const navigate = useNavigate()
-
+    const dispatch = useDispatch()
 
     //vérification des droits d'accès
     useEffect(() => {
@@ -32,6 +33,13 @@ const Admin = () => {
 
     }, [role, navigate])
 
+    //Récupération de la saison actuelle
+    useEffect(() => {
+        if (!isLoading && !isGetSuccess && error ==='') {
+            dispatch(getAllTypetubes(token))
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token, isGetSuccess, isLoading, error])
 
     //render
     return (

@@ -241,16 +241,7 @@ export const getAllPrixtubes = token => {
         .then(res => {
             const listPrixtubes = []
             res.data.data.forEach(prixtube => {
-                listPrixtubes.push({
-                    id: prixtube.id,
-                    marque: prixtube.marque,
-                    prix: prixtube.prix,
-                    prixMembre: prixtube.prixMembre,
-                    actif: prixtube.actif,
-                    idTypeTube: prixtube.idTypeTube,
-                    dateCreation: prixtube.dateCreation,
-                    horodatage: prixtube.horodatage
-                })
+                listPrixtubes.push(prixtube)
             })
             dispatch(getPrixtubesSuccess(listPrixtubes))
         })

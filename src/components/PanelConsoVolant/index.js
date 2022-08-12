@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { Badge, Card, Col } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Table } from 'semantic-ui-react'
 import FooterConsoVolants from './FooterConsoVolants'
 import TableConsoMois from './TableConsoMois'
-import { setStock } from '../../Redux/actions/stocks'
 import './index.css'
 
 const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock, orderable}) => {
 
+
     //Redux
-    const {prixtubes} = useSelector(state => state.prixtubes)
+    const stocks = useSelector(state => state.stocks)
     
     //States
     const [totalUsed, setTotalUsed] = useState(0)
@@ -18,63 +18,26 @@ const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock, orderable}) =>
     const [totalPriceUsed, setTotalPriceUsed] = useState(0.0)
     const [totalPriceOrdered, setTotalPriceOrdered] = useState(0.0)
     const [stockVolant, setStockVolant] = useState(0)
-
-    //Hooks
-    const dispatch = useDispatch()
-
-    
-    const {id, stock, ConsoMois, TypeTube} = consovolant
-
+   
 
     useEffect(() => {
-        const calculConsoVolant = ConsoMois.reduce((prevValue, data) => {
-            return {
-                nbUsed: prevValue.nbUsed + data.nbTubesUsed,
-                priceUsed: prevValue.priceUsed + (data.nbTubesUsed * getPrixPrixtubes(data.idPrixTube)),
-                nbOrdered:  prevValue.nbOrdered + data.nbTubesOrdered,
-                priceOrdered: prevValue.priceOrdered + (data.nbTubesOrdered * getPrixPrixtubes(data.idPrixTube)) 
-            }
-        }, {nbUsed:0, priceUsed: 0.0, nbOrdered: 0, priceOrdered: 0.0})
-
-        setTotalUsed(calculConsoVolant.nbUsed)
-        setTotalPriceUsed(Number(calculConsoVolant.priceUsed.toFixed(2)))
-        setTotalOrdered(calculConsoVolant.nbOrdered)
-        setTotalPriceOrdered(Number(calculConsoVolant.priceOrdered.toFixed(2)))
-        setStockVolant(stock - calculConsoVolant.nbUsed + calculConsoVolant.nbOrdered)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ConsoMois, stock])
-
-
-    useEffect(() => {    
-        dispatch(setStock({
-            id: id,
-            nbUsed: totalUsed,
-            priceUsed: totalPriceUsed,
-            nbOrdered: totalOrdered,
-            priceOrdered: totalPriceOrdered,
-            TypeTube: TypeTube,
-            stock: stockVolant
-        }))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id, totalUsed, totalOrdered, totalPriceUsed, totalPriceOrdered, stockVolant])
-    
-
-
-    const getPrixPrixtubes = idPrixTube => {
-        const prixtube = prixtubes.filter(data => data.id === idPrixTube)
-        if (prixtube.length !== 0) {
-            return prixtube[0].prix
-        } else {
-            return 0
+        if (Object.keys(stocks).length > 0) {
+            const dataFilter = stocks.filter(data => data.id === consovolant.id)[0]
+            setTotalUsed(dataFilter.nbUsed)
+            setTotalPriceUsed(dataFilter.priceUsed)
+            setTotalOrdered(dataFilter.nbOrdered)
+            setTotalPriceOrdered(dataFilter.priceOrdered)
+            setStockVolant(dataFilter.stock)
         }
-    }
+    }, [stocks, consovolant])
+    
 
     const activeLowLevel = stockVolant <= consovolant.TypeTube.lowLevel
     ? <Badge bg='danger'>Stock bas</Badge>
     : <Badge bg='light' text='white' style={{opacity:'0'}}>Stock bas</Badge>
 
     const displayConsoMois = consovolant => consovolant.ConsoMois.map(moisData => <TableConsoMois   key={moisData.id} 
-                                                                                                    moisData={moisData} 
+                                                                                                    moisData={moisData}
                                                                                                     orderable={orderable}/>)
 
     return (

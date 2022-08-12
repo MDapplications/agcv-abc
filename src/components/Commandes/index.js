@@ -223,6 +223,11 @@ const Commandes = () => {
                     {data.ConsoMoi.name}
                 </Table.Cell>
                 <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                    {data.PrixTube.TypeTube.comment === '' 
+                    ? data.PrixTube.TypeTube.name 
+                    : data.PrixTube.TypeTube.name + ' - ' + data.PrixTube.TypeTube.comment}
+                </Table.Cell>
+                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
                     {data.PrixTube.marque}
                 </Table.Cell>
                 <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
@@ -248,7 +253,8 @@ const Commandes = () => {
                 <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Date</Table.HeaderCell>
                 <Table.HeaderCell textAlign='center'>Membre</Table.HeaderCell>
                 <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Mois</Table.HeaderCell>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Prix du tube</Table.HeaderCell>
+                <Table.HeaderCell textAlign='center'>Type du tube</Table.HeaderCell>
+                <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Marque</Table.HeaderCell>
                 <Table.HeaderCell collapsing textAlign='center' style={{width: '80px'}}>Nb de tube</Table.HeaderCell>
                 <Table.HeaderCell collapsing textAlign='center' style={{width: '80px'}}>Prix</Table.HeaderCell>
                 <Table.HeaderCell collapsing textAlign='center' style={{width: '80px'}}>Réglée</Table.HeaderCell>

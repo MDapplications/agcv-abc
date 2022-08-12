@@ -97,16 +97,6 @@ const ParamSaison = () => {
         }
     }, [editLowLevel, listTypetubes.errorEdit])
 
-  
-    const getNameTypeTube = id => {
-        const typetube = typetubes.filter(data => data.id === id)
-        if (typetube.length > 0) {
-            return typetube[0].name
-        } else {
-            return 'non défini'
-        }
-    }
-
 
     const handleChangeStock = event => {
         setStock({...stock, [event.target.id]: Number(event.target.value)})
@@ -159,7 +149,7 @@ const ParamSaison = () => {
                     <Row className='d-flex justify-content-start' xs={1} md={2} lg={5}>
                         <Col className='d-flex align-items-center'>
                             <span>
-                                {getNameTypeTube(dataVolant.idTypeTube)}
+                                {dataVolant.TypeTube.name}
                             </span>
                         </Col>
                         <Col>

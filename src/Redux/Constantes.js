@@ -153,6 +153,7 @@ export const REMOVE_ALL_COMPETITIONS = "REMOVE_ALL_COMPETITIONS"
 //Stock
 export const INIT_STOCKS = "INIT_STOCKS"
 export const SET_STOCK = "SET_STOCK"
+export const ADD_STOCK = "ADD_STOCK"
 
 
 //Restocks

@@ -2,14 +2,10 @@ import React, { useEffect } from 'react'
 import { Container } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, Outlet } from 'react-router-dom'
-import { getAllConsoMois } from '../../Redux/actions/consomois'
-import { getAllConsoVolants } from '../../Redux/actions/consovolants'
-import { getAllPrixtubes } from '../../Redux/actions/prixtubes'
 import { getSaisonActive } from '../../Redux/actions/saisons'
-import { getAllTypetubes } from '../../Redux/actions/typetubes'
 import NavBarHome from '../NavBarHome'
 import Loader from '../Loader'
-import { setStock } from '../../Redux/actions/stocks'
+import { addStock, initStocks, setStock } from '../../Redux/actions/stocks'
 
 
 const Home = () => {
@@ -19,116 +15,75 @@ const Home = () => {
 
 
     //Redux
-    const {saisonActive, isLoadingGetActive, isGetSaisonActiveSuccess} = useSelector(state => state.saisons)
-    const listConsoVolant = useSelector(state => state.consovolants)
-    const listConsoMois = useSelector(state => state.consomois)
-    const listTypetube = useSelector(state => state.typetubes)
-    const listPrixtube = useSelector(state => state.prixtubes)
-    const stocksVolants = useSelector(state => state.stocks)
+    const {saisonActive, isLoadingGetActive, isGetSaisonActiveSuccess, errorGetActive} = useSelector(state => state.saisons)
+    const stocks = useSelector(state => state.stocks)
     const {token} = useSelector(state => state.user)
-
-    const {consovolants} = listConsoVolant
-    const {consomois} = listConsoMois
-    const {typetubes} = listTypetube
-    const {prixtubes} = listPrixtube
 
 
     //Récupération de la saison actuelle
     useEffect(() => {
-        if (!isLoadingGetActive && !isGetSaisonActiveSuccess)
-        if (saisonActive === undefined) {
-            dispatch(getSaisonActive(token))
-        } else if (saisonActive.id === undefined) {
-            dispatch(getSaisonActive(token))
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token, saisonActive])
-
-
-    //Récupération des ConsoVolants de la saison actuelle
-    useEffect(() => {
-        if (saisonActive.id > 0) {
-            if (consovolants.length === 0) {
-                dispatch(getAllConsoVolants(token, saisonActive.id))
+        if (!isLoadingGetActive && !isGetSaisonActiveSuccess && errorGetActive ==='') {
+            if (saisonActive === undefined) {
+                dispatch(getSaisonActive(token))
+                dispatch(initStocks())
+            } else if (saisonActive.id === undefined) {
+                dispatch(getSaisonActive(token))
+                dispatch(initStocks())
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token, saisonActive])
-
-
-    //Récupération des ConsoMois de chaque ConsoVolants
-    useEffect(() => {
-        if (listConsoVolant.isGetSuccess) {
-            if (consomois.length === 0) {
-                consovolants.forEach(consoVolant => {
-                    dispatch(getAllConsoMois(token, consoVolant.id))
-                })
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token, listConsoVolant.isGetSuccess])
+    }, [token, saisonActive, isLoadingGetActive, isGetSaisonActiveSuccess, errorGetActive])
 
 
     useEffect(() => {
-        if (typetubes.length === 0) {
-            dispatch(getAllTypetubes(token))
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token])
+        if (isGetSaisonActiveSuccess) {
+            if (saisonActive.id > 0) {
+                if (Object.keys(stocks).length === 0) {
+                    saisonActive.ConsoVolants.forEach(consovolant => {
+                        const idConsoVolant = consovolant.id
+                        const TypeTube = consovolant.TypeTube
+                        const calculConsoVolant = consovolant.ConsoMois.reduce((prevValue, data) => {
+                            return {
+                                nbUsed: prevValue.nbUsed + data.nbTubesUsed,
+                                priceUsed: prevValue.priceUsed + (data.nbTubesUsed * data.PrixTube.prix),
+                                nbOrdered:  prevValue.nbOrdered + data.nbTubesOrdered,
+                                priceOrdered: prevValue.priceOrdered + (data.nbTubesOrdered * data.PrixTube.prix) 
+                            }
+                        }, {nbUsed:0, priceUsed: 0.0, nbOrdered: 0, priceOrdered: 0.0})
 
-
-    useEffect(() => {
-        if (prixtubes.length === 0) {
-            dispatch(getAllPrixtubes(token))
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token])
-
-
-    useEffect(() => {
-        if (listPrixtube.isGetSuccess && listConsoVolant.isGetSuccess) {
-            if (Object.keys(stocksVolants).length === 0) {
-                consovolants.forEach(consovolant => {
-                    const idConsoVolant = consovolant.id
-                    const TypeTube = consovolant.TypeTube
-                    const calculConsoVolant = consovolant.ConsoMois.reduce((prevValue, data) => {
-                        return {
-                            nbUsed: prevValue.nbUsed + data.nbTubesUsed,
-                            priceUsed: prevValue.priceUsed + (data.nbTubesUsed * getPrixPrixtubes(data.idPrixTube)),
-                            nbOrdered:  prevValue.nbOrdered + data.nbTubesOrdered,
-                            priceOrdered: prevValue.priceOrdered + (data.nbTubesOrdered * getPrixPrixtubes(data.idPrixTube)) 
-                        }
-                    }, {nbUsed:0, priceUsed: 0.0, nbOrdered: 0, priceOrdered: 0.0})
-
-                    const stock = consovolant.stock - calculConsoVolant.nbUsed + calculConsoVolant.nbOrdered
-                
-                    dispatch(setStock({
-                        id: idConsoVolant,
-                        nbUsed: calculConsoVolant.nbUsed,
-                        priceUsed: Number(calculConsoVolant.priceUsed.toFixed(2)),
-                        nbOrdered: calculConsoVolant.nbOrdered,
-                        priceOrdered: Number(calculConsoVolant.priceOrdered.toFixed(2)),
-                        TypeTube: TypeTube,
-                        stock: stock
-                    }))
-                
-                })
+                        const stock = consovolant.stock - calculConsoVolant.nbUsed + calculConsoVolant.nbOrdered
+                    
+                        dispatch(setStock({
+                            id: idConsoVolant,
+                            nbUsed: calculConsoVolant.nbUsed,
+                            priceUsed: Number(calculConsoVolant.priceUsed.toFixed(2)),
+                            nbOrdered: calculConsoVolant.nbOrdered,
+                            priceOrdered: Number(calculConsoVolant.priceOrdered.toFixed(2)),
+                            TypeTube: TypeTube,
+                            stock: stock
+                        }))
+                    
+                    })
+                    
+                    saisonActive.Commandes.forEach(commande => {
+                        const idConsoVolant = commande.ConsoMoi.idConsoVolant
+                        const nbUsed = commande.nbTubesOrdered
+                        const priceUsed = commande.nbTubesOrdered * commande.PrixTube.prix //(commande.PrixTube.prix - commande.PrixTube.prixMembre)
+                    
+                        dispatch(addStock({
+                            id: idConsoVolant,
+                            nbUsed: nbUsed,
+                            priceUsed: Number(priceUsed.toFixed(2)),
+                            nbOrdered: 0,
+                            priceOrdered: 0,
+                            stock: nbUsed
+                        }))
+                    })
+                }  
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [listPrixtube.isGetSuccess, listConsoVolant.isGetSuccess, stocksVolants, consovolants])
-    
-
-
-    const getPrixPrixtubes = idPrixTube => {
-        const prixtube = prixtubes.filter(data => data.id === idPrixTube)
-        if (prixtube.length !== 0) {
-            return prixtube[0].prix
-        } else {
-            return 0
-        }
-    }
-
+    }, [stocks, saisonActive, isGetSaisonActiveSuccess])
 
 
     const displaySaisonActuelle = saisonActive.id !== undefined ?
@@ -136,9 +91,8 @@ const Home = () => {
     : <h1 className='display-6'>Aucune saison active actuellement</h1>
 
 
-    const displayHome = isLoadingGetActive || listConsoVolant.isLoading || 
-    listConsoMois.isLoading || listTypetube.isLoading || listPrixtube.isLoading 
-    ? <Loader loadingMsg='Données de la saison actuelle en cours de récupération...'/>
+    const displayHome = isLoadingGetActive && errorGetActive !== ''
+    ? <Loader loadingMsg='Données de la saison actuelle en cours de récupération...' isMsg={true}/>
     : <>
         <NavBarHome context='home'/>
 

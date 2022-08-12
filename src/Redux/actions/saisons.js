@@ -374,18 +374,14 @@ export const getSaisonActive = token => {
         .then(res => {
             const saisonActive = []
             res.data.data.forEach(saison => {
-                saisonActive.push({
-                    id: saison.id,
-                    anneeDebut: saison.anneeDebut,
-                    anneeFin: saison.anneeFin,
-                    budget: saison.budget,
-                    active: saison.active,
-                    dateCreation: saison.dateCreation,
-                    horodatage: saison.horodatage,
-                    ConsoVolants: saison.ConsoVolants,
-                    commandes: saison.Commandes,
-                    competitions: saison.Competitions
+                saisonActive.push(saison)
+                const listConsoVolants = []
+                saison.ConsoVolants.forEach(consovolant => {
+                    listConsoVolants.push({...consovolant,
+                        ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name)),
+                    })
                 })
+                saisonActive[0].ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
             })
             dispatch(getSaisonActiveSuccess(saisonActive[0]))
         })
@@ -414,14 +410,15 @@ export const getAllSaisons = token => {
         .then(res => {
             const listSaisons = []
             res.data.data.forEach(saison => {
-                listSaisons.push({
-                    id: saison.id,
-                    anneeDebut: saison.anneeDebut,
-                    anneeFin: saison.anneeFin,
-                    budget: saison.budget,
-                    active: saison.active,
-                    dateCreation: saison.dateCreation,
-                    horodatage: saison.horodatage
+                listSaisons.push(saison)
+                const listConsoVolants = []
+                saison.ConsoVolants.forEach(consovolant => {
+                    listConsoVolants.push({...consovolant,
+                        ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name)),
+                    })
+                })
+                listSaisons.forEach(saison => {
+                    saison.ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
                 })
             })
             dispatch(getSaisonsSuccess(listSaisons))

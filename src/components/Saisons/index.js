@@ -20,7 +20,7 @@ const Saisons = () => {
 
 
     //Redux
-    const user = useSelector(state => state.user)
+    const {token, role} = useSelector(state => state.user)
     const listSaisons = useSelector(state => state.saisons)
     const listTypetubes = useSelector(state => state.typetubes)
 
@@ -52,10 +52,10 @@ const Saisons = () => {
     useEffect(() => {
         dispatch(getPage('saisons'))
         if (listSaisons.saisons.length === 0) {
-            dispatch(getAllSaisons(user.token))
+            dispatch(getAllSaisons(token))
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, user])
+    }, [dispatch, token])
 
 
 
@@ -81,7 +81,7 @@ const Saisons = () => {
     useEffect(() => {
         if (listSaisons.isDeleteSuccess) {
             setRequestDelete(false)
-            dispatch(refreshAllSaisons(user.token))
+            dispatch(refreshAllSaisons(token))
 
             toast.success("Suppression de la saison réalisé avec succès !",
             {
@@ -94,7 +94,7 @@ const Saisons = () => {
             })
         }
 
-    }, [dispatch, listSaisons, user])
+    }, [dispatch, listSaisons, token])
 
 
 
@@ -105,7 +105,7 @@ const Saisons = () => {
 
 
 
-    const displayBtnDelete = saisonData => user.role > 2 
+    const displayBtnDelete = saisonData => role > 2 
         ? <Popup
             trigger={
                 <Button 
@@ -221,7 +221,7 @@ const Saisons = () => {
 
     const handleDelete = id => {
         setRequestDelete(true)
-        dispatch(deleteSaison(user.token, id))
+        dispatch(deleteSaison(token, id))
         setOpenModalDelete(false)
     }
 

@@ -23,7 +23,7 @@ const PrixTubes = () => {
         //Redux
         const user = useSelector(state => state.user)
         const listPrixtubes = useSelector(state => state.prixtubes)
-        const listTypetubes = useSelector(state => state.typetubes)
+        const {typetubes, isDeleteSuccess, error, isLoading} = useSelector(state => state.typetubes)
 
     
         //States
@@ -49,10 +49,7 @@ const PrixTubes = () => {
             backgroundColor: '#fcebf0',
             color: '#e42558'
         }
-    
-    
-    
-        
+            
         useEffect(() => {
             dispatch(getPage('prixtubes'))
             if (listPrixtubes.prixtubes.length === 0) {
@@ -60,25 +57,19 @@ const PrixTubes = () => {
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [dispatch, user])
-
-
             
         useEffect(() => {
-            if (listTypetubes.typetubes.length === 0) {
+            if (typetubes.length === 0) {
                 dispatch(getAllTypetubes(user.token))
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [dispatch, user])
-    
-    
+        }, [typetubes, user])
     
         useEffect(() => {
             if (listPrixtubes.error !== '') {
                 setErrorMsg(listPrixtubes.error)
             }
         }, [listPrixtubes])
-        
-    
     
         useEffect(() => {
             if (requestDelete === true) {
@@ -89,10 +80,8 @@ const PrixTubes = () => {
             }
         }, [requestDelete, listPrixtubes])
     
-    
-    
         useEffect(() => {
-            if (listPrixtubes.isDeleteSuccess) {
+            if (isDeleteSuccess) {
                 setRequestDelete(false)
                 dispatch(refreshAllPrixtubes(user.token))
     
@@ -107,27 +96,10 @@ const PrixTubes = () => {
                 })
             }
 
-        }, [dispatch, listPrixtubes, user])
-    
+        }, [dispatch, isDeleteSuccess, user])
     
         //Affichage au format prix
-        const currencyLocalPrice = prix => {
-            return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(prix)
-        }
-
-
-
-        const getTypeTubeById = idTypeTube => {
-            if (listTypetubes.typetubes.length !== 0) {
-                const data = listTypetubes.typetubes.filter(typetube => typetube.id === idTypeTube)
-                if (data.length !== 0) {
-                    return data[0].name + (data[0].comment ? ` (${data[0].comment})` : '')
-                } else return ''
-            } else {
-                return ''
-            }
-        }
-
+        const currencyLocalPrice = prix => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(prix)
 
         const displayBtnDelete = prixtubeData => user.role > 2 
         ? <Popup
@@ -141,7 +113,6 @@ const PrixTubes = () => {
             style={stylePopupDelete}
             content={`Supprimer`}/>
         : null
-    
     
     
         //Bontons action
@@ -171,7 +142,9 @@ const PrixTubes = () => {
         const displayTableRow = (data) => {
             return (
                 <Table.Row id='row-prixtubes' key={data.id} active>
-                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='left'>{getTypeTubeById(data.idTypeTube)}</Table.Cell>
+                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='left'>
+                        {data.TypeTube.name + (data.TypeTube.comment ? ` (${data.TypeTube.comment})` : '')}
+                    </Table.Cell>
                     <Table.Cell id='cell-prixtubes' className='align-middle'>{data.marque}</Table.Cell>
                     <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{currencyLocalPrice(data.prix)}</Table.Cell>
                     <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{currencyLocalPrice(data.prixMembre)}</Table.Cell>
@@ -239,9 +212,9 @@ const PrixTubes = () => {
         const showModalCreate = () => setOpenModalCreate(true)
 
 
-        const loaderTypeTubes = listTypetubes.isLoading
+        const loaderTypeTubes = isLoading
         ? <Button className='me-2' disabled><Icon name='plus'/> Prix d'un tube</Button>
-        : listTypetubes.error !== '' ? <Button className='me-2' disabled><Icon name='plus'/> Prix d'un tube</Button>
+        : error !== '' ? <Button className='me-2' disabled><Icon name='plus'/> Prix d'un tube</Button>
         : <Button className='me-2' onClick={showModalCreate}><Icon name='plus'/> Prix d'un tube</Button>
     
         
