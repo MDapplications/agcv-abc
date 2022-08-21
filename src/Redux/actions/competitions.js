@@ -121,13 +121,11 @@ const editCompetitionSuccess = () => {
 
 
 
-
-
 //mise à jour de la liste des type tubes
-export const refreshAllCompetitions = token => {
+export const refreshAllCompetitions = (token, idSaison) => {
     return dispatch => {
         dispatch(initCompetitions())
-        dispatch(getAllCompetitions(token))
+        dispatch(getAllCompetitions(token, idSaison))
     }
 }
 
@@ -137,7 +135,7 @@ export const refreshAllCompetitions = token => {
 export const createCompetition = (token, data) => {
     return dispatch => {
         
-        const {name, nbTubesUsed, idSaison, idTypeTube} = data
+        const {name, nbTubesUsed, idSaison, idStock, idTypeTube} = data
 
         dispatch(createCompetitionLoading())
 
@@ -147,6 +145,7 @@ export const createCompetition = (token, data) => {
                 name,
                 nbTubesUsed,
                 idSaison,
+                idStock,
                 idTypeTube,
             },
             { headers: { "Authorization": `Bearer ${token}` } }
@@ -155,9 +154,9 @@ export const createCompetition = (token, data) => {
             dispatch(createCompetitionSuccess())
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(createCompetitionError(err.response.data.message))
-            } else {
+            } catch(error) {
                 dispatch(createCompetitionError(err))
             }
         })
@@ -167,29 +166,26 @@ export const createCompetition = (token, data) => {
 
 
 
-
-
-
 //Dispatch des actions lors de l'update d'un competition
 export const editCompetition = (token, data) => {
     return dispatch => {
 
-        const {nbTubesUsed} = data
+        const {name, nbTubesUsed} = data
 
         dispatch(editCompetitionLoading())
 
         axios.put(
             `${REACT_APP_AGCV_API_URL}/competitions/${data.id}`,
-            { nbTubesUsed },
+            { name, nbTubesUsed },
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(() => {
             dispatch(editCompetitionSuccess())
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(editCompetitionError(err.response.data.message))
-            } else {
+            } catch(error) {
                 dispatch(editCompetitionError(err))
             }
         })
@@ -214,9 +210,9 @@ export const deleteCompetition = (token, id) => {
             dispatch(deleteCompetitionSuccess())
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(deleteCompetitionError(err.response.data.message))
-            } else {
+            } catch(error) {
                 dispatch(deleteCompetitionError(err))
             }
         })
@@ -229,34 +225,26 @@ export const deleteCompetition = (token, id) => {
 
 
 
-export const getAllCompetitions = token => {
+export const getAllCompetitions = (token, idSaison) => {
     return dispatch => {
 
         dispatch(getCompetitionsLoading())
 
         axios.get(
-            `${REACT_APP_AGCV_API_URL}/competitions`,
+            `${REACT_APP_AGCV_API_URL}/competitions?idSaison=${idSaison}`,
             { headers: { "Authorization": `Bearer ${token}` } }
         )
         .then(res => {
             const listCompetitions = []
             res.data.data.forEach(competition => {
-                listCompetitions.push({
-                    id: competition.id,
-                    name: competition.name,
-                    nbTubesUsed: competition.nbTubesUsed,
-                    idSaison: competition.idSaison,
-                    idTypeTube: competition.idTypeTube,
-                    dateCreation: competition.dateCreation,
-                    horodatage: competition.horodatage
-                })
+                listCompetitions.push(competition)
             })
             dispatch(getCompetitionsSuccess(listCompetitions))
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(getCompetitionsError(err.response.data.message))
-            } else {
+            } catch(error) {
                 dispatch(getCompetitionsError(err))
             }
         })

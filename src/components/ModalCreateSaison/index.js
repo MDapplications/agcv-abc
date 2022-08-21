@@ -10,7 +10,7 @@ const ModalCreateSaison = ({hideModal}) => {
 
     const initSaison = {
         anneeDebut: dateNow,
-        anneeFin: dateNow + 1,
+        anneeFin: 0,
         budget: 0.0,
         active: true,
     }
@@ -30,7 +30,12 @@ const ModalCreateSaison = ({hideModal}) => {
     useEffect(() => {
         setSaisonCreate({...saisonCreate, budget: Number(budgetText)})
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [budgetText, saisonCreate])
+
+    useEffect(() => {
+        setSaisonCreate({...saisonCreate, anneeFin: saisonCreate.anneeDebut + 1})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [saisonCreate.anneeDebut])
   
 
 
@@ -41,6 +46,7 @@ const ModalCreateSaison = ({hideModal}) => {
     }
 
     const handleChange = event => setSaisonCreate({...saisonCreate, [event.target.id]: Number(event.target.value)})
+
 
     return (
         <ModalCreateTemplate 
@@ -67,12 +73,12 @@ const ModalCreateSaison = ({hideModal}) => {
                                     id='anneeDebut' 
                                     type='number'
                                     className='mb-3'
-                                    placeholder='2022'
+                                    //placeholder='2022'
                                     value={saisonCreate.anneeDebut}
                                     onChange={handleChange}/>
                             </Col>
                         </Row>
-
+ 
                         <Row>
                             <Col sm="3">
                                 <Form.Label className='mb-0 mt-2'>
@@ -85,8 +91,8 @@ const ModalCreateSaison = ({hideModal}) => {
                                     type='number'
                                     className='mb-3'
                                     placeholder='2023'
-                                    value={saisonCreate.anneeFin}
-                                    onChange={handleChange}/>
+                                    disabled
+                                    value={saisonCreate.anneeFin}/>
                             </Col>
                         </Row>
 

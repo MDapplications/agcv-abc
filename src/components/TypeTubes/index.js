@@ -20,8 +20,8 @@ const TypeTubes = () => {
 
 
     //Redux
-    const user = useSelector(state => state.user)
-    const listTypetubes = useSelector(state => state.typetubes)
+    const {token, role} = useSelector(state => state.user)
+    const {typetubes, isLoading, error, errorDelete, isDeleteSuccess, isGetSuccess} = useSelector(state => state.typetubes)
 
 
     //States
@@ -51,38 +51,39 @@ const TypeTubes = () => {
 
     
     useEffect(() => {
-        dispatch(getPage('typetubes'))
-        if (listTypetubes.typetubes.length === 0) {
-            dispatch(getAllTypetubes(user.token))
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, user])
-
+        dispatch(getPage('typetubes')) // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
 
     useEffect(() => {
-        if (listTypetubes.error !== '') {
-            setErrorMsg(listTypetubes.error)
+        if (!isLoading && !isGetSuccess && error === '') {
+            dispatch(getAllTypetubes(token))
         }
-    }, [listTypetubes])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading, isGetSuccess, error, token])
+
+
+    useEffect(() => {
+        if (!isLoading && error !== '') {
+            setErrorMsg(error)
+        }
+    }, [isLoading, error])
     
 
 
     useEffect(() => {
-        if (requestDelete === true) {
-            if (listTypetubes.errorDelete !== '') {
-                setRequestDelete(false)
-                setErrorMsg(listTypetubes.errorDelete)
-            }
+        if (requestDelete && errorDelete !== '') {
+            setRequestDelete(false)
+            setErrorMsg(errorDelete)
         }
-    }, [requestDelete, listTypetubes])
+    }, [requestDelete, errorDelete])
 
 
 
     useEffect(() => {
-        if (listTypetubes.isDeleteSuccess) {
+        if (requestDelete && isDeleteSuccess) {
             setRequestDelete(false)
-            dispatch(refreshAllTypetubes(user.token))
+            dispatch(refreshAllTypetubes(token))
 
             toast.success("Suppression du typetube réalisé avec succès !",
             {
@@ -94,7 +95,8 @@ const TypeTubes = () => {
                 duration: 5000,
             })
         }
-    }, [dispatch, listTypetubes, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [requestDelete, isDeleteSuccess, token])
 
 
 
@@ -109,6 +111,7 @@ const TypeTubes = () => {
                         <Button 
                             className='me-2' 
                             variant="primary"
+                            disabled={role < 3 && typeTubeData.default}
                             onClick={() => showModalEdit(typeTubeData)}>
                                 <Icon name='edit'/>
                         </Button>
@@ -120,6 +123,7 @@ const TypeTubes = () => {
                     trigger={
                         <Button 
                             variant="danger"
+                            disabled={role < 3 && typeTubeData.default}
                             onClick={() => showModalDelete(typeTubeData)}>
                                 <Icon name='trash'/>
                         </Button>
@@ -136,7 +140,7 @@ const TypeTubes = () => {
 
 
     //Affichage de la liste des typetubes (data)
-    const displayData = listTypetubes.typetubes.map(typetubeData => {
+    const displayData = typetubes.map(typetubeData => {
         const date = new Date(typetubeData.dateCreation)
         return(
             <Table.Row id='row-typetubes' key={typetubeData.id} active>
@@ -155,7 +159,7 @@ const TypeTubes = () => {
 
 
     //Affichage de la liste des typetubes (en-tête)
-    const displayTableTypetube = listTypetubes.typetubes.length !== 0
+    const displayTableTypetube = typetubes.length !== 0
     ?   <Table className='mt-4' color='blue' inverted>
             <Table.Header>
                 <Table.Row>
@@ -186,9 +190,9 @@ const TypeTubes = () => {
 
 
     //Affichage des états de la requête GET /typetubes
-    const loaderTypeTubes = listTypetubes.isLoading
+    const loaderTypeTubes = isLoading
     ? <Loader className='mt-5' loadingMsg='Chargement des type de tubes en cours...'/>
-    : listTypetubes.error !== '' ? displayError : displayTableTypetube
+    : error !== '' ? displayError : displayTableTypetube
 
 
     //fermeture des modals
@@ -215,7 +219,7 @@ const TypeTubes = () => {
 
     const handleDelete = id => {
         setRequestDelete(true)
-        dispatch(deleteTypetube(user.token, id))
+        dispatch(deleteTypetube(token, id))
         setOpenModalDelete(false)
     }
 

@@ -21,7 +21,8 @@ const ModalCreateTypeTube = ({hideModal}) => {
 
 
     //Redux
-    const {token} = useSelector(state => state.user)
+    const {token, role} = useSelector(state => state.user)
+    const {saisonActive} = useSelector(state => state.saisons)
     const listTypetubes = useSelector(state => state.typetubes)
 
 
@@ -48,6 +49,13 @@ const ModalCreateTypeTube = ({hideModal}) => {
     }
 
 
+    const disableBtnConfirm = () => {
+        if (role < 3) {
+            return typeTubeCreate.comment === ''
+        }
+    }
+
+
     const handleChange = event => settypeTubeCreate({...typeTubeCreate, [event.target.id]: event.target.value})
     const handleChangeSwitch = event => settypeTubeCreate({...typeTubeCreate, [event.target.id]: event.target.checked})
     const handleChangeSelect = event => setType(Number(event.target.value))
@@ -62,6 +70,7 @@ const ModalCreateTypeTube = ({hideModal}) => {
             stateSelector={listTypetubes}
             actionCreate={() => createTypetube(token, typeTubeCreate)}
             actionRefreshData={() => refreshAllTypetubes(token)}
+            disableBtnConfirm={disableBtnConfirm()}
             title="Création type de tube">
 
             {/* children */}
@@ -129,6 +138,7 @@ const ModalCreateTypeTube = ({hideModal}) => {
                                     className='mt-4' 
                                     type="switch"
                                     id="default"
+                                    disabled={role < 3}
                                     checked={typeTubeCreate.default}
                                     onChange={handleChangeSwitch}/>
                             </Col>

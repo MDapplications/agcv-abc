@@ -14,10 +14,8 @@ import Admin from '../Admin'
 import Saisons from '../Saisons'
 import Membres from '../Membres'
 import PrixTubes from '../PrixTubes'
-import SuperAdmin from '../SuperAdmin'
 import ParamSaison from '../ParamSaison'
 import Utilisateurs from '../Utilisateurs'
-import ApercuGlobal from '../ApercuGlobal'
 import TypeTubes from '../TypeTubes'
 import Commandes from '../Commandes'
 import Competitions from '../Competitions'
@@ -49,10 +47,6 @@ const App = () => {
             <Route path="saisons" element={<Saisons/>}/>
             <Route path="membres" element={<Membres/>}/>
             <Route path="prixtubes" element={<PrixTubes/>}/>
-          </Route>
-
-          <Route path="/superAdmin" element={<SuperAdmin/>}>
-            <Route index element={<ApercuGlobal/>}/>
             <Route path="users" element={<Utilisateurs/>}/>
             <Route path="typetubes" element={<TypeTubes/>}/>
           </Route>

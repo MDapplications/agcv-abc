@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { Icon, Popup, Table } from 'semantic-ui-react'
 import { getPage } from '../../Redux/actions/pages'
-import { deleteSaison, getAllSaisons, refreshAllSaisons } from '../../Redux/actions/saisons'
+import { deleteSaison, getAllSaisons, getSaisonActive, initSaisonActive, refreshAllSaisons } from '../../Redux/actions/saisons'
 import AlertDanger from '../AlertDanger'
 import Loader from '../Loader'
 import Modal2Confirmation from '../Modal2Confirmation'
@@ -30,6 +30,7 @@ const Saisons = () => {
     const [openModalDelete, setOpenModalDelete] = useState(false)
     const [openModalEdit, setOpenModalEdit] = useState(false)
     const [requestDelete, setRequestDelete] = useState(false)
+    const [requestEdit, setRequestEdit] = useState(false)
     const [saisonDelete, setSaisonDelete] = useState({})
     const [saisonEdit, setSaisonEdit] = useState({})
     const [errorMsg, setErrorMsg] = useState('')
@@ -81,7 +82,9 @@ const Saisons = () => {
     useEffect(() => {
         if (listSaisons.isDeleteSuccess) {
             setRequestDelete(false)
+            dispatch(initSaisonActive())
             dispatch(refreshAllSaisons(token))
+            
 
             toast.success("Suppression de la saison réalisé avec succès !",
             {
@@ -96,6 +99,24 @@ const Saisons = () => {
 
     }, [dispatch, listSaisons, token])
 
+    useEffect(() => {
+        if (requestEdit && listSaisons.errorDelete !== '') {
+            setRequestEdit(false)
+            setErrorMsg(listSaisons.errorDelete)
+        }
+    }, [requestEdit, listSaisons])
+
+
+
+    useEffect(() => {
+        if (requestEdit && listSaisons.isEditSuccess) {
+            setRequestEdit(false)
+            dispatch(initSaisonActive())
+            dispatch(getSaisonActive(token))
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [listSaisons, token])
+
 
 
     //Affichage au format prix
@@ -105,18 +126,19 @@ const Saisons = () => {
 
 
 
-    const displayBtnDelete = saisonData => role > 2 
-        ? <Popup
+    const displayBtnDelete = saisonData => {
+        return <Popup
             trigger={
                 <Button 
                     variant="danger"
+                    disabled={role < 3}
                     onClick={() => showModalDelete(saisonData)}>
                         <Icon name='trash'/>
                 </Button>
             }
             style={stylePopupDelete}
             content={`Supprimer`}/>
-        : null
+    }
     
     
     
@@ -129,6 +151,7 @@ const Saisons = () => {
                         <Button 
                             className='me-2' 
                             variant="primary"
+                            disabled={role < 3}
                             onClick={() => showModalEdit(saisonData)}>
                                 <Icon name='edit'/>
                         </Button>
@@ -242,8 +265,9 @@ const Saisons = () => {
     const showModalEdit = (saisonData) => {
         setSaisonEdit({
             id: saisonData.id,
-            actif: saisonData.actif
+            active: saisonData.active
         })
+        setRequestEdit(true)
         setOpenModalEdit(true)
     }
 

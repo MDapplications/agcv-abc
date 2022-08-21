@@ -27,9 +27,8 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
 
     //Redux
     const listCommandes = useSelector(state => state.commandes)
-    const {typetubes} = useSelector(state => state.typetubes)
-    const {consovolants} = useSelector(state => state.consovolants)
-    const {prixtubes}= useSelector(state => state.prixtubes)
+    const {typetubesOrderable} = useSelector(state => state.typetubes)
+    const {saisonActive} = useSelector(state => state.saisons)
     const {token} = useSelector(state => state.user)
     const {isGetSuccess, membres} = useSelector(state => state.membres)
 
@@ -42,19 +41,18 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
     
     useEffect(() => {
         if (commandeCreate.idTypeTube === 0) {
-            const typetubesOrderable = typetubes.filter(data => data.orderable === true)
             if (typetubesOrderable.length > 0) {
                 const {id} = typetubesOrderable[0]
                 setCommandeCreate({...commandeCreate, idTypeTube: id})
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [commandeCreate.idTypeTube, typetubes])
+    }, [commandeCreate.idTypeTube, typetubesOrderable])
 
     useEffect(() => {
         if (commandeCreate.idTypeTube !== 0) {
             if (consovolant === null) {
-                const dataFilter = consovolants.filter(data => data.idTypeTube === commandeCreate.idTypeTube)
+                const dataFilter = saisonActive.ConsoVolants.filter(data => data.idTypeTube === commandeCreate.idTypeTube)
                 if (dataFilter.length > 0) {
                     setConsovolant(dataFilter[0])
                 } else {
@@ -63,7 +61,7 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [commandeCreate.idTypeTube, consovolants])
+    }, [commandeCreate.idTypeTube, saisonActive.ConsoVolants])
     
     useEffect(() => {
         if (consovolant !== null) {
@@ -78,16 +76,13 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
  
     useEffect(() => {
         if (consomois !== null) {
-            const dataFilter = prixtubes.filter(data => data.id === consomois.idPrixTube)
-            if (dataFilter.length > 0) {
-                setCommandeCreate({...commandeCreate, idPrixTube: dataFilter[0].id})
-                setPrixtube({
-                    id: dataFilter[0].id,
-                    marque: dataFilter[0].marque,
-                    prix: dataFilter[0].prix,
-                    prixMembre: dataFilter[0].prixMembre
-                })
-            }
+            setCommandeCreate({...commandeCreate, idPrixTube: consomois.PrixTube.id})
+            setPrixtube({
+                id: consomois.PrixTube.id,
+                marque: consomois.PrixTube.marque,
+                prix: consomois.PrixTube.prix,
+                prixMembre: consomois.PrixTube.prixMembre
+            })
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [consomois])
@@ -134,21 +129,20 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
     })
 
 
-    const showOptionTypeTube = typetubes.map(typetubeData => {
-        if (typetubeData.orderable) {
-            return (
-                <option key={typetubeData.id} value={typetubeData.id}>
-                    {typetubeData.name + (typetubeData.comment ? ` (${typetubeData.comment})` : '')}
-                </option>
-            )
-        }
-        return null
+    const showOptionTypeTube = typetubesOrderable.map(typetubeData => {
+        return (
+            <option key={typetubeData.id} value={typetubeData.id}>
+                {typetubeData.name + (typetubeData.comment ? ` (${typetubeData.comment})` : '')}
+            </option>
+        )
     })
     
     const showOptionConsoMois = consovolant !== null && 
     consovolant.ConsoMois.map(moisData => <option key={moisData.id} value={moisData.id}>{moisData.name}</option>)
 
     const md = 4
+
+    const disableBtnConfirm = commandeCreate.nbTubesOrdered <= 0
 
 
     return (
@@ -159,6 +153,7 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
             stateSelector={listCommandes}
             actionCreate={() => createCommande(token, commandeCreate)}
             actionRefreshData={() => refreshAllCommandes(token, idSaison)}
+            disableBtnConfirm={disableBtnConfirm}
             title="Nouvelle commande">
 
         {/* children */}

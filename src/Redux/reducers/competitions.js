@@ -17,6 +17,7 @@ const initialState = {
     isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
+    isGetSuccess: false,
     isCreateSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
@@ -38,6 +39,7 @@ const reducerCompetitions = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: true,
+                isGetSuccess: false,
                 competitions: [],
                 error: ''
             }
@@ -46,6 +48,7 @@ const reducerCompetitions = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: true,
                 competitions: action.payload,
                 error: ''
             }
@@ -54,6 +57,7 @@ const reducerCompetitions = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: false,
                 competitions: [],
                 error: action.payload
             }
@@ -71,6 +75,7 @@ const reducerCompetitions = (state=initialState, action) => {
             return {
                 ...state,
                 isLoadingCreate: false,
+                isCreateSuccess: false,
                 errorCreate: action.payload
             }
 
@@ -79,7 +84,8 @@ const reducerCompetitions = (state=initialState, action) => {
             return {
                 ...state,
                 isLoadingCreate: false,
-                isCreateSuccess: true
+                isCreateSuccess: true,
+                errorCreate: ''
             }
 
         //DELETE

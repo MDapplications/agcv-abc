@@ -16,8 +16,7 @@ const NavBarAdmin = () => {
         backgroundColor: '#bbbbbb'
     }
 
-
-    const displayLinkSuperAdmin = role > 2 && <Link id='super-admin' className='nav-link link-secondary' to='/superAdmin'>Super Admin</Link>
+    const displayLinkUsers = role > 2 && <Link id='a-admin' className='nav-link link-secondary' to='users'>Gestion des utilisateurs</Link> 
 
     //render
     return (
@@ -26,16 +25,18 @@ const NavBarAdmin = () => {
                 
                 <div className='d-flex justify-content-start'>
                     <div className='py-2 pe-5'>{username}</div>
-                    {displayLinkSuperAdmin}
                 </div>
 
                 <div className='d-flex justify-content-end'>
                     <Nav className='me-5'> 
 
-                        <Link id='a-admin' className='nav-link link-secondary' to=''>Paramètres de la saison</Link>  
+                        <Link id='a-admin' className='nav-link link-secondary' to=''>Paramètres de la saison</Link>
+                        {displayLinkUsers}
                         <Link id='a-admin' className='nav-link link-secondary' to='saisons'>Saisons</Link>  
                         <Link id='a-admin' className='nav-link link-secondary' to='membres'>Membres</Link>  
                         <Link id='a-admin' className='nav-link link-secondary' to='prixtubes'>Prix des tubes</Link>
+                        <Link id='a-admin' className='nav-link link-secondary' to='typetubes'>TypeTubes</Link>
+                         
                         <Link id='back-home' className='nav-link link-secondary' to='/home'>Page principale</Link>
                         
                     </Nav>

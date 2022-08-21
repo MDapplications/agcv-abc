@@ -36,7 +36,7 @@ const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock, orderable}) =>
     ? <Badge bg='danger'>Stock bas</Badge>
     : <Badge bg='light' text='white' style={{opacity:'0'}}>Stock bas</Badge>
 
-    const displayConsoMois = consovolant => consovolant.ConsoMois.map(moisData => <TableConsoMois   key={moisData.id} 
+    const displayConsoMois = () => consovolant.ConsoMois.map(moisData => <TableConsoMois   key={moisData.id} 
                                                                                                     moisData={moisData}
                                                                                                     orderable={orderable}/>)
 
@@ -76,7 +76,7 @@ const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock, orderable}) =>
                 </Table.Header>
 
                 <Table.Body>
-                    {displayConsoMois(consovolant)}
+                    {displayConsoMois()}
                 </Table.Body>
 
                 {/* FOOTER */}

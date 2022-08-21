@@ -8,8 +8,10 @@ import reducerPrixtubes from './reducers/prixtubes'
 import reducerSaisons from './reducers/saisons'
 import reducerConsoVolants from './reducers/consovolants'
 import reducerConsoMois from './reducers/consomois'
+import reducerRestocks from './reducers/restocks'
 import reducerStock from './reducers/stocks'
 import reducerCommandes from './reducers/commandes'
+import reducerCompetitions from './reducers/competitions'
 
 
 const store = configureStore({
@@ -20,11 +22,13 @@ const store = configureStore({
     typetubes: reducerTypetubes,
     membres: reducerMembres,
     prixtubes: reducerPrixtubes,
+    restocks: reducerRestocks,
     saisons: reducerSaisons,
     consovolants: reducerConsoVolants,
     consomois: reducerConsoMois,
     stocks: reducerStock,
     commandes: reducerCommandes,
+    competitions: reducerCompetitions,
   }
 })
 

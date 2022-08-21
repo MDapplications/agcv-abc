@@ -22,6 +22,8 @@ const ModalCreateMembre = ({hideModal}) => {
     //States
     const [membreCreate, setMembreCreate] = useState(initMembre)
     
+    const disableBtnConfirm = membreCreate.prenom.length < 2 || membreCreate.prenom.length > 40 ||
+    membreCreate.nom.length < 2 || membreCreate.nom.length > 40
 
     const handleChange = event => setMembreCreate({...membreCreate, [event.target.id]: event.target.value})
 
@@ -35,6 +37,7 @@ const ModalCreateMembre = ({hideModal}) => {
             stateSelector={listMembres}
             actionCreate={() => createMembre(token, membreCreate)}
             actionRefreshData={() => refreshAllMembres(token)}
+            disableBtnConfirm={disableBtnConfirm}
             title="Création membre">
 
             {/* children */}

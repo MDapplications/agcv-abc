@@ -51,7 +51,7 @@ const TableConsoMois = ({moisData, orderable}) => {
                                 </option>)
 
 
-    const handleChangePrixMois = (moisData) => {
+    const handleChangePrixMois = () => {
         const data = {
             id: moisData.id,
             idConsoVolant: moisData.idConsoVolant,
@@ -64,7 +64,7 @@ const TableConsoMois = ({moisData, orderable}) => {
     }
 
 
-    const handleChangeTubesUsedMois = (moisData) => {
+    const handleChangeTubesUsedMois = () => {
         const data = {
             id: moisData.id,
             idConsoVolant: moisData.idConsoVolant,
@@ -76,7 +76,7 @@ const TableConsoMois = ({moisData, orderable}) => {
         dispatch(editConsoMois(token, data))
     }
 
-    const handleChangeTubesOrderedMois = (moisData) => {
+    const handleChangeTubesOrderedMois = () => {
         const data = {
             id: moisData.id,
             idConsoVolant: moisData.idConsoVolant,
@@ -88,7 +88,7 @@ const TableConsoMois = ({moisData, orderable}) => {
         dispatch(editConsoMois(token, data))
     }
 
-    const changePrixtube = moisData => {
+    const changePrixtube = () => {
         const idTypeTube = saisonActive.ConsoVolants.filter(data => data.id === moisData.idConsoVolant)[0].idTypeTube
         const listPrixtubes = prixtubes.filter(data => data.idTypeTube === idTypeTube && data.actif === true)
         const idPrixTube = moisData.PrixTube.id
@@ -108,7 +108,7 @@ const TableConsoMois = ({moisData, orderable}) => {
                 <Button 
                 color='blue' 
                 disabled={isNaN(prixData) || prixData === 0}
-                onClick={() => handleChangePrixMois(moisData)}>
+                onClick={handleChangePrixMois}>
                     Modifier
                 </Button>
             </div>
@@ -116,7 +116,7 @@ const TableConsoMois = ({moisData, orderable}) => {
     }
     
 
-    const changeNbTubesOrdered = moisData => {
+    const changeNbTubesOrdered = () => {
 
         return (     
         <div className='d-flex justify-content-between pop-prix'>
@@ -130,7 +130,7 @@ const TableConsoMois = ({moisData, orderable}) => {
             <Button 
                 color='blue' 
                 disabled={isNaN(nbTubesOrdered) || nbTubesOrdered < 0}
-                onClick={() => handleChangeTubesOrderedMois(moisData)}>
+                onClick={handleChangeTubesOrderedMois}>
                     Modifier
             </Button>
         </div>
@@ -138,32 +138,42 @@ const TableConsoMois = ({moisData, orderable}) => {
     }
 
 
-    const changeNbTubesUsed = moisData => {
+    const changeNbTubesUsed = () => {
         return (     
         <div className='d-flex justify-content-between pop-prix'>
 
             <Form.Control 
                 id='nbTubesUsed'
                 className='me-2'
+                type='number'
+                min={0}
                 defaultValue={moisData.nbTubesUsed}
                 onChange={handleNbTubesUsed}/>
 
             <Button 
                 color='blue' 
                 disabled={isNaN(nbTubesUsed) || nbTubesUsed < 0}
-                onClick={() => handleChangeTubesUsedMois(moisData)}>
+                onClick={handleChangeTubesUsedMois}>
                     Modifier
             </Button>
         </div>
         )
     }
 
-    const nbTubesUsedByOrder = moisData => {
+    const nbTubesUsedByOrder = () => {
         if (moisData.Commandes.length > 0) {
-            const calculTubesUsed = moisData.Commandes.reduce((prevValue, commande) => {
+            return moisData.Commandes.reduce((prevValue, commande) => {
                 return prevValue + commande.nbTubesOrdered
             }, 0)
-            return calculTubesUsed
+        }
+        return 0
+    }
+
+    const nbTubesUsedByRestock = () => {
+        if (moisData.Restocks.length > 0) {
+            return moisData.Restocks.reduce((prevValue, restock) => {
+                return prevValue + restock.value
+            }, 0)
         }
         return 0
     }
@@ -171,7 +181,7 @@ const TableConsoMois = ({moisData, orderable}) => {
 
     const displayTubesUsed = orderable 
     ?   <Table.Cell id='td-mois' className='nbTubesUsed orderable' textAlign='center'>
-            {moisData.nbTubesUsed + nbTubesUsedByOrder(moisData)}
+            {moisData.nbTubesUsed + nbTubesUsedByOrder() + nbTubesUsedByRestock()}
         </Table.Cell>
     : <Popup
         trigger={
@@ -179,7 +189,7 @@ const TableConsoMois = ({moisData, orderable}) => {
                     {moisData.nbTubesUsed}
             </Table.Cell>
         }
-        content={changeNbTubesUsed(moisData)}
+        content={changeNbTubesUsed()}
         on='click'
         position='right center'/>
 
@@ -193,7 +203,8 @@ const TableConsoMois = ({moisData, orderable}) => {
             {currencyLocalPrice(
                 (moisData.nbTubesUsed * moisData.PrixTube.prix) +
                 //(nbTubesUsedByOrder(moisData) * (moisData.PrixTube.prix - moisData.PrixTube.prixMembre)) 
-                (nbTubesUsedByOrder(moisData) * moisData.PrixTube.prix)
+                (nbTubesUsedByOrder() * moisData.PrixTube.prix) + 
+                (nbTubesUsedByRestock() * moisData.PrixTube.prix)
             )}
         </Table.Cell>
 
@@ -203,7 +214,7 @@ const TableConsoMois = ({moisData, orderable}) => {
                     {moisData.nbTubesOrdered}
                 </Table.Cell>
             }
-            content={changeNbTubesOrdered(moisData)}
+            content={changeNbTubesOrdered()}
             on='click'
             position='right center'
         />
@@ -213,17 +224,18 @@ const TableConsoMois = ({moisData, orderable}) => {
             {currencyLocalPrice(moisData.nbTubesOrdered * moisData.PrixTube.prix)}
         </Table.Cell>
 
+        
         <Popup
-            trigger={
+            trigger={  
                 <Table.Cell id='td-mois' className='prix' textAlign='center' onClick={() => setmoisId(moisData.id)}>
                     {currencyLocalPrice(moisData.PrixTube.prix)}
                 </Table.Cell>
             }
-            content={changePrixtube(moisData)}
+            content={changePrixtube()}
             on='click'
             position='left center'
         />
-
+        
       </Table.Row>
     )
 }

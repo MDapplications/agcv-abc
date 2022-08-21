@@ -26,7 +26,7 @@ const helperAddStock = (state, data) => {
         nbOrdered: value.nbOrdered + data.nbOrdered,
         priceOrdered: value.priceOrdered + data.priceOrdered,
         TypeTube: value.TypeTube,
-        stock: value.stock + data.stock
+        stock: value.stock - data.stock
     })
     return newState
 }

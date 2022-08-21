@@ -2,6 +2,9 @@ import axios from 'axios'
 import {    GET_TYPETUBES_LOADING,
             GET_TYPETUBES_SUCCESS,
             GET_TYPETUBES_ERROR,
+            GET_TYPETUBES_OREDERABLE_LOADING,
+            GET_TYPETUBES_OREDERABLE_SUCCESS,
+            GET_TYPETUBES_OREDERABLE_ERROR,
             CREATE_TYPETUBE_LOADING,
             CREATE_TYPETUBE_ERROR,
             CREATE_TYPETUBE_SUCCESS,
@@ -45,6 +48,31 @@ const getTypetubesSuccess = data => {
 const getTypetubesError = error => {
     return {
         type: GET_TYPETUBES_ERROR,     
+        payload: error
+    }
+}
+
+
+//En attente de réponse de l'API
+const getTypetubesOrderableLoading = () => {
+    return {
+        type: GET_TYPETUBES_OREDERABLE_LOADING
+    }
+}
+
+//Réponse reçu
+const getTypetubesOrderableSuccess = data => {
+    return {
+        type: GET_TYPETUBES_OREDERABLE_SUCCESS,     
+        payload: data  
+    }
+}
+
+
+//Réponse d'erreur
+const getTypetubesOrderableError = error => {
+    return {
+        type: GET_TYPETUBES_OREDERABLE_ERROR,     
         payload: error
     }
 }
@@ -156,9 +184,9 @@ export const createTypetube = (token, data) => {
             dispatch(createTypetubeSuccess())
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(createTypetubeError(err.response.data.message))
-            } else {
+            } catch (error) {
                 dispatch(createTypetubeError(err))
             }
         })
@@ -192,9 +220,9 @@ export const editTypetube = (token, data) => {
             dispatch(editTypetubeSuccess())
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(editTypetubeError(err.response.data.message))
-            } else {
+            } catch (error) {
                 dispatch(editTypetubeError(err))
             }
         })
@@ -219,9 +247,9 @@ export const deleteTypetube = (token, id) => {
             dispatch(deleteTypetubeSuccess())
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(deleteTypetubeError(err.response.data.message))
-            } else {
+            } catch (error) {
                 dispatch(deleteTypetubeError(err))
             }
         })
@@ -246,24 +274,43 @@ export const getAllTypetubes = token => {
         .then(res => {
             const listTypetubes = []
             res.data.data.forEach(typetube => {
-                listTypetubes.push({
-                    id: typetube.id,
-                    name: typetube.name,
-                    comment: typetube.comment,
-                    orderable: typetube.orderable,
-                    lowLevel: typetube.lowLevel,
-                    default: typetube.default,
-                    dateCreation: typetube.dateCreation,
-                    horodatage: typetube.horodatage
-                })
+                listTypetubes.push(typetube)
             })
             dispatch(getTypetubesSuccess(listTypetubes))
         })
         .catch(err => {
-            if (err.response.data.message !== undefined) {
+            try {
                 dispatch(getTypetubesError(err.response.data.message))
-            } else {
+            } catch (error) {
                 dispatch(getTypetubesError(err))
+            }
+        })
+
+    }
+}
+
+
+export const getTypetubesOrderable = token => {
+    return dispatch => {
+
+        dispatch(getTypetubesOrderableLoading())
+
+        axios.get(
+            `${REACT_APP_AGCV_API_URL}/typetubes?orderable=true`,
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(res => {
+            const listTypetubes = []
+            res.data.data.forEach(typetube => {
+                listTypetubes.push(typetube)
+            })
+            dispatch(getTypetubesOrderableSuccess(listTypetubes))
+        })
+        .catch(err => {
+            try {
+                dispatch(getTypetubesOrderableError(err.response.data.message))
+            } catch (error) {
+                dispatch(getTypetubesOrderableError(err))
             }
         })
 

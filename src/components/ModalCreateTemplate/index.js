@@ -12,6 +12,7 @@ const ModalCreateTemplate = ({  hideModal,
                                 stateSelector,
                                 actionCreate,
                                 actionRefreshData,
+                                disableBtnConfirm,
                                 children}) => {
    
  
@@ -54,13 +55,14 @@ const ModalCreateTemplate = ({  hideModal,
         dispatch(actionCreate())
     }
 
+    const optionDisableBtnConfirm = disableBtnConfirm === undefined ? false : disableBtnConfirm
 
     const displayError = errorMsg !== '' && 
     <AlertDanger errorMsg={errorMsg} style={styleAlert}/>
 
 
     const displayBtnCreate = isLoadingCreate
-    ? <Loader isMsg={false}/> : <Button variant='primary' onClick={handleCreate}>Créer</Button>
+    ? <Loader isMsg={false}/> : <Button variant='primary' disabled={optionDisableBtnConfirm} onClick={handleCreate}>Créer</Button>
     
     
     return (

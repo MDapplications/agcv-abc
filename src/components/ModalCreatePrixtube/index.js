@@ -41,6 +41,8 @@ const ModalCreatePrixtube = ({hideModal}) => {
         </option>
     )
 
+    const disableBtnConfirm = prixTubeCreate.marque.length < 2 || prixTubeCreate.marque.length > 40 || 
+    prixTubeCreate.prix <= 0.01 || prixTubeCreate.prix < prixTubeCreate.prixMembre
 
 
     const handleChangePrix = event => {
@@ -64,6 +66,7 @@ const ModalCreatePrixtube = ({hideModal}) => {
             stateSelector={listPrixtubes}
             actionCreate={() => createPrixtube(token, prixTubeCreate)}
             actionRefreshData={() => refreshAllPrixtubes(token)}
+            disableBtnConfirm={disableBtnConfirm}
             title="Création d'un prix de tube">
 
             {/* children */}
@@ -114,6 +117,7 @@ const ModalCreatePrixtube = ({hideModal}) => {
                                     id='prixMembre' 
                                     type='number'
                                     className='mb-3'
+                                    min={0}
                                     value={prixMembreText}
                                     onChange={handleChangePrixMembre}/>
                             </Col>

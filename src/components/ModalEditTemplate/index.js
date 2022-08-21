@@ -14,6 +14,7 @@ const ModalEditTemplate = ({hideModal,
                             stateSelector,
                             actionRefreshData,
                             actionEdit,
+                            disableBtnConfirm,
                             children}) => {
 
 
@@ -65,13 +66,14 @@ const ModalEditTemplate = ({hideModal,
         dispatch(actionEdit())
     }
 
+    const optionDisableBtnConfirm = disableBtnConfirm === undefined ? false : disableBtnConfirm
 
     const displayError = errorMsg !== '' && 
     <AlertDanger errorMsg={errorMsg} style={styleAlert}/>
 
 
     const displayBtnEdit = isLoadingEdit
-    ? <Loader isMsg={false}/> : <Button variant='primary' onClick={handleConfirm}>Modifier</Button>
+    ? <Loader isMsg={false}/> : <Button variant='primary' disabled={optionDisableBtnConfirm} onClick={handleConfirm}>Modifier</Button>
 
 
     return (

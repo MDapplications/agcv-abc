@@ -141,21 +141,24 @@ const ParamSaison = () => {
 
 
 
-    const displayStockConsoVolants = Object.keys(saisonActive).some(key => key === 'ConsoVolants') ?
+    const displayStockConsoVolants = saisonActive !== undefined && Object.keys(saisonActive).some(key => key === 'ConsoVolants') ?
         saisonActive.ConsoVolants.length !== (0 || undefined)
         ? saisonActive.ConsoVolants.map(dataVolant => {
             return (
                 <Form.Group className="mb-3" key={dataVolant.id}>
-                    <Row className='d-flex justify-content-start' xs={1} md={2} lg={5}>
+                    <Row className='d-flex justify-content-start' xs={1} sm={2}>
                         <Col className='d-flex align-items-center'>
                             <span>
-                                {dataVolant.TypeTube.name}
+                                {dataVolant.TypeTube.comment 
+                                ? `${dataVolant.TypeTube.name - dataVolant.TypeTube.comment}`
+                                : dataVolant.TypeTube.name}
                             </span>
                         </Col>
                         <Col>
                             <Form.Control 
                                 id={`stock-${dataVolant.id}`}
                                 type='number'
+                                min={0}
                                 className='align-middle'
                                 defaultValue={dataVolant.stock}
                                 onChange={handleChangeStock}/>
@@ -168,20 +171,34 @@ const ParamSaison = () => {
     : <Loader />
 
 
-    const displayLowLevelTypeTubes = Object.keys(typetubes).length > 0 
+    const displayNameTypetube = dataTypetube => dataTypetube.comment !== '' 
+    ? <Col>
+        <div className='d-flex justify-content-start'>
+            {`Seuil bas d'alerte - ${dataTypetube.name}`}
+        </div>
+        <div className='d-flex justify-content-start'>
+            {dataTypetube.comment}
+        </div>
+    </Col> 
+    : <Col className='d-flex align-items-center justify-content-start'>
+        <span>{`Seuil bas d'alerte - ${dataTypetube.name}`}</span>
+    </Col>
+
+
+
+    const displayLowLevelTypeTubes = saisonActive !== undefined && Object.keys(typetubes).length > 0 
     ? typetubes.map(dataTypetube => {
         return (
             <Form.Group className="mb-3" key={dataTypetube.id}>
-                <Row className='d-flex justify-content-start' xs={1} md={2} lg={5}>
-                        <Col className='d-flex align-items-center'>
-                            <span>
-                                {`Seuil bas d'alerte - ${dataTypetube.name}`}
-                            </span>
-                        </Col>
+                <Row className='d-flex justify-content-start' xs={1} sm={2}>
+                        
+                        {displayNameTypetube(dataTypetube)}
+                        
                         <Col>
                             <Form.Control 
                                 id={`tube-${dataTypetube.id}`}
                                 type='number'
+                                min={0}
                                 className='align-middle'
                                 defaultValue={dataTypetube.lowLevel}
                                 onChange={handleChangeLowLevel}/>
@@ -195,8 +212,8 @@ const ParamSaison = () => {
 
 
 
-    return (
-        <>
+    return saisonActive !== undefined  
+    ?   <>
             <Container className='mb-5'>
                 <main role='main'>
                     <div className='mx-0 my-2 p-2 bg-light border rounded-3'>
@@ -206,53 +223,61 @@ const ParamSaison = () => {
                     </div>
                 </main>
 
-                <Card className='mt-5'>
-                    <Card.Header>
-                        <Card.Title className="my-2 text-start">Paramétrages des stocks initiaux :</Card.Title>
-                    </Card.Header>
-                    <Card.Body>
-                        <Form>
-                            {displayStockConsoVolants}
+                <Row className='justify-content-center mt-5'>
+                    <Col xl={5}>
+                        <Card>
+                            <Card.Header>
+                                <Card.Title className="my-2 text-start">Paramétrages des stocks initiaux :</Card.Title>
+                            </Card.Header>
+                            <Card.Body>
+                                <Form>
+                                    {displayStockConsoVolants}
 
-                            <Row xs={1} md={1} lg={3}>
-                                <Col>
-                                    <Button
-                                        variant='primary' 
-                                        onClick={submitStocks}>
-                                            Modifier
-                                    </Button>
-                                </Col>
-                            </Row>
-                            
-                        </Form>
-                    </Card.Body>
-                </Card>
+                                    <Row>
+                                        <Col>
+                                            <Button
+                                                variant='primary' 
+                                                onClick={submitStocks}>
+                                                    Modifier
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                    
+                                </Form>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
 
-                <Card className='mt-3'>
-                    <Card.Header>
-                        <Card.Title className="my-2 text-start">Paramétrages des alertes seuils bas :</Card.Title>
-                    </Card.Header>
-                    <Card.Body> 
-                        <Form>
-                            {displayLowLevelTypeTubes}
+                <Row className='justify-content-center mt-3'>
+                    <Col xl={5}>
+                        <Card>
+                            <Card.Header>
+                                <Card.Title className="my-2 text-start">Paramétrages des alertes seuils bas :</Card.Title>
+                            </Card.Header>
+                            <Card.Body> 
+                                <Form>
+                                    {displayLowLevelTypeTubes}
 
-                            <Row xs={1} md={1} lg={3}>
-                                <Col>
-                                    <Button
-                                        variant='primary' 
-                                        onClick={submitLowLevel}>
-                                            Modifier
-                                    </Button>
-                                </Col>
-                            </Row>
-                            
-                        </Form>
-                    </Card.Body>
-                </Card>
+                                    <Row>
+                                        <Col>
+                                            <Button
+                                                variant='primary' 
+                                                onClick={submitLowLevel}>
+                                                    Modifier
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                    
+                                </Form>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
                 
             </Container>
         </>
-    )
+    : <p className='mt-3'>Aucune saison active pour le moment 😕</p>
 }
 
 export default ParamSaison

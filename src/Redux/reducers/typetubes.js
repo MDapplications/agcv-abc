@@ -1,6 +1,9 @@
 import {    GET_TYPETUBES_LOADING,
             GET_TYPETUBES_SUCCESS,
             GET_TYPETUBES_ERROR,
+            GET_TYPETUBES_OREDERABLE_LOADING,
+            GET_TYPETUBES_OREDERABLE_SUCCESS,
+            GET_TYPETUBES_OREDERABLE_ERROR,
             CREATE_TYPETUBE_LOADING,
             CREATE_TYPETUBE_ERROR,
             CREATE_TYPETUBE_SUCCESS,
@@ -15,15 +18,19 @@ import {    GET_TYPETUBES_LOADING,
 
 const initialState = {
     isLoading: false,
+    isLoadingGetOrderable: false,
     isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
     isGetSuccess: false,
+    isGetOrderableSuccess: false,
     isCreateSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
+    typetubesOrderable: [],
     typetubes: [],
     error: '',
+    errorGetOrderable: '',
     errorCreate: '',
     errorDelete: '',
     errorEdit: ''
@@ -62,6 +69,35 @@ const reducerTypetubes = (state=initialState, action) => {
                 typetubes: [],
                 error: action.payload
             }
+
+        //GET ORDERABLE
+        case GET_TYPETUBES_OREDERABLE_LOADING:
+            return {
+                ...state,
+                isLoadingGetOrderable: true,
+                isGetOrderableSuccess: false,
+                typetubesOrderable: [],
+                errorGetOrderable: ''
+            }
+
+        case GET_TYPETUBES_OREDERABLE_SUCCESS:
+            return {
+                ...state,
+                isLoadingGetOrderable: false,
+                isGetOrderableSuccess: true,
+                typetubesOrderable: action.payload,
+                errorGetOrderable: ''
+            }
+
+        case GET_TYPETUBES_OREDERABLE_ERROR:
+            return {
+                ...state,
+                isLoadingGetOrderable: false,
+                isGetOrderableSuccess: false,
+                typetubesOrderable: [],
+                errorGetOrderable: action.payload
+            }
+
 
         //CREATE
         case CREATE_TYPETUBE_LOADING:

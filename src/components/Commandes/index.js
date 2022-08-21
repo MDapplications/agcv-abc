@@ -6,6 +6,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Icon, Popup, Table } from 'semantic-ui-react'
 import { deleteCommande, refreshAllCommandes } from '../../Redux/actions/commandes'
 import { refreshAllMembres } from '../../Redux/actions/membres'
+import { initSaisons } from '../../Redux/actions/saisons'
+import { getTypetubesOrderable } from '../../Redux/actions/typetubes'
 import Loader from '../Loader'
 import Modal2Confirmation from '../Modal2Confirmation'
 import ModalCreateCommande from '../ModalCreateCommande'
@@ -30,7 +32,7 @@ const Commandes = () => {
     }
 
     const styleStatusFalse = {
-        backgroundColor: 'rgb(255 0 0 / 46%)',
+        backgroundColor: '#db2828',
     }
 
     const initSaison = {id: Number(idSaison)}
@@ -62,6 +64,7 @@ const Commandes = () => {
     if (token !== '') {
         dispatch(refreshAllCommandes(token, idSaison))
         dispatch(refreshAllMembres(token))
+        dispatch(getTypetubesOrderable(token))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, idSaison])
@@ -110,7 +113,12 @@ const Commandes = () => {
 
 
     
-    const handleBack = () => navigate(-1)
+    const handleBack = () => {
+        if (saisonSelect.id === initSaison.id) {
+            dispatch(initSaisons())
+        }
+        navigate(-1)
+    }
 
     //Affichage au format prix
     const currencyLocalPrice = prix => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(prix)
@@ -212,7 +220,7 @@ const Commandes = () => {
 
     const displayData = commandes.map(data => {
         return (
-            <Table.Row id='row-commandes' key={data.id} active>
+            <Table.Row id='row-commandes' key={data.id} active={data.status}>
                 <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
                     {new Date(data.horodatage).toLocaleDateString()}
                 </Table.Cell>
@@ -267,13 +275,15 @@ const Commandes = () => {
     )
 
 
-    const displaylistCommandes = !showError && !loadCommandes
-    ? <Loader/>
-    : loadCommandes && !showError
-        ? commandes.length === 0 
-            ? <p>Aucune commande pour cette saison.</p>
-            : displayTableCommandes
-        : <Alert variant='danger'>{error + errorDelete}</Alert>
+    const displaylistCommandes = () => {if (!showError && !loadCommandes) {
+        return <Loader/>
+    } else if (loadCommandes && !showError) {
+        if (commandes.length === 0) {
+            return <p className='mt-4'>Aucune commande pour cette saison.</p>
+        } else {
+            return displayTableCommandes
+        }
+    } else return <Alert variant='danger'>{error + errorDelete}</Alert>}
 
 
     const displaySaisonActive = enableActions && <> 
@@ -304,7 +314,7 @@ const Commandes = () => {
                         </div>
                     </main>
 
-                    {displaylistCommandes}
+                    {displaylistCommandes()}
 
                 </Container>
             </div>

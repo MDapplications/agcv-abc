@@ -23,10 +23,7 @@ const Home = () => {
     //Récupération de la saison actuelle
     useEffect(() => {
         if (!isLoadingGetActive && !isGetSaisonActiveSuccess && errorGetActive ==='') {
-            if (saisonActive === undefined) {
-                dispatch(getSaisonActive(token))
-                dispatch(initStocks())
-            } else if (saisonActive.id === undefined) {
+            if (saisonActive === undefined || saisonActive.id === undefined) {
                 dispatch(getSaisonActive(token))
                 dispatch(initStocks())
             }
@@ -36,7 +33,7 @@ const Home = () => {
 
 
     useEffect(() => {
-        if (isGetSaisonActiveSuccess) {
+        if (isGetSaisonActiveSuccess && saisonActive !== undefined) {
             if (saisonActive.id > 0) {
                 if (Object.keys(stocks).length === 0) {
                     saisonActive.ConsoVolants.forEach(consovolant => {
@@ -79,6 +76,23 @@ const Home = () => {
                             stock: nbUsed
                         }))
                     })
+
+                    saisonActive.Stocks.forEach(stock => {
+                        stock.Restocks.forEach(restock => {
+                            const idConsoVolant = restock.ConsoMoi.idConsoVolant
+                            const nbUsed = restock.value
+                            const priceUsed = restock.value * restock.ConsoMoi.PrixTube.prix
+
+                            dispatch(addStock({
+                                id: idConsoVolant,
+                                nbUsed: nbUsed,
+                                priceUsed: Number(priceUsed.toFixed(2)),
+                                nbOrdered: 0,
+                                priceOrdered: 0,
+                                stock: nbUsed
+                            }))
+                        })
+                    })
                 }  
             }
         }
@@ -86,12 +100,22 @@ const Home = () => {
     }, [stocks, saisonActive, isGetSaisonActiveSuccess])
 
 
-    const displaySaisonActuelle = saisonActive.id !== undefined ?
-    <h1 className='display-4'>Saison : {saisonActive.anneeDebut + ' - ' + saisonActive.anneeFin}</h1>
+    const displaySaisonActuelle = saisonActive !== undefined 
+    ? saisonActive['id'] !== undefined 
+        ? <h1 className='display-4'>Saison : {saisonActive.anneeDebut + ' - ' + saisonActive.anneeFin}</h1>
+        : <h1 className='display-6'>Aucune saison active actuellement</h1>
     : <h1 className='display-6'>Aucune saison active actuellement</h1>
 
+    const displayLinkHome = saisonActive !== undefined
+    ? <nav className='nav justify-content-center'>
+        <Link className='nav-link link-secondary' to=''>Résumé</Link>
+        <Link className='nav-link link-secondary' to='consoVolants'>Consommation des volants</Link>
+        <Link className='nav-link link-secondary' to='consoTests'>Consommation des volants d'essais</Link>
+    </nav>
+    : null
 
-    const displayHome = isLoadingGetActive && errorGetActive !== ''
+    //render
+    return isLoadingGetActive && errorGetActive !== ''
     ? <Loader loadingMsg='Données de la saison actuelle en cours de récupération...' isMsg={true}/>
     : <>
         <NavBarHome context='home'/>
@@ -101,21 +125,13 @@ const Home = () => {
                 <Container className='text-center justify-content-center'>
                     {displaySaisonActuelle}
                     <hr className='m-0 mb-2'/>
-                    <nav className='nav justify-content-center'>
-                        <Link className='nav-link link-secondary' to=''>Résumé</Link>
-                        <Link className='nav-link link-secondary' to='consoVolants'>Consommation des volants</Link>
-                        <Link className='nav-link link-secondary' to='consoTests'>Consommation des volants d'essais</Link>
-                    </nav>
+                    {displayLinkHome}
                 </Container>
             </div>
         </main>
 
         <Outlet/>
     </>
-
-
-    //render
-    return displayHome
 }
 
 export default Home

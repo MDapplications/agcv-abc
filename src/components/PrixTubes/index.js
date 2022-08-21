@@ -21,9 +21,9 @@ const PrixTubes = () => {
 
 
         //Redux
-        const user = useSelector(state => state.user)
-        const listPrixtubes = useSelector(state => state.prixtubes)
-        const {typetubes, isDeleteSuccess, error, isLoading} = useSelector(state => state.typetubes)
+        const {token, role} = useSelector(state => state.user)
+        const {prixtubes, isDeleteSuccess, isGetSuccess, error, errorDelete, isLoading} = useSelector(state => state.prixtubes)
+        const listTypetubes = useSelector(state => state.typetubes)
 
     
         //States
@@ -50,40 +50,41 @@ const PrixTubes = () => {
             color: '#e42558'
         }
             
-        useEffect(() => {
-            dispatch(getPage('prixtubes'))
-            if (listPrixtubes.prixtubes.length === 0) {
-                dispatch(getAllPrixtubes(user.token))
-            }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [dispatch, user])
+        useEffect(() => {dispatch(getPage('prixtubes'))}, [dispatch])
             
         useEffect(() => {
-            if (typetubes.length === 0) {
-                dispatch(getAllTypetubes(user.token))
+            if (!isLoading && !isGetSuccess && error === '') {
+                dispatch(getAllPrixtubes(token))
+                dispatch(getAllTypetubes(token))
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [typetubes, user])
+        }, [isLoading, isGetSuccess, error, token])
     
         useEffect(() => {
-            if (listPrixtubes.error !== '') {
-                setErrorMsg(listPrixtubes.error)
+            if (!isLoading && error !== '') {
+                setErrorMsg(error)
             }
-        }, [listPrixtubes])
-    
+        }, [error, isLoading])
+
         useEffect(() => {
-            if (requestDelete === true) {
-                if (listPrixtubes.errorDelete !== '') {
-                    setRequestDelete(false)
-                    setErrorMsg(listPrixtubes.errorDelete)
-                }
+            if (!listTypetubes.isLoading && listTypetubes.error !== '') {
+                setErrorMsg(listTypetubes.error)
             }
-        }, [requestDelete, listPrixtubes])
+        }, [listTypetubes])
     
         useEffect(() => {
             if (isDeleteSuccess) {
+                if (errorDelete !== '') {
+                    setRequestDelete(false)
+                    setErrorMsg(errorDelete)
+                }
+            }
+        }, [isDeleteSuccess, errorDelete])
+    
+        useEffect(() => {
+            if (requestDelete) {
                 setRequestDelete(false)
-                dispatch(refreshAllPrixtubes(user.token))
+                dispatch(refreshAllPrixtubes(token))
     
                 toast.success("Suppression du prix de tube réalisé avec succès !",
                 {
@@ -95,13 +96,13 @@ const PrixTubes = () => {
                     duration: 5000,
                 })
             }
-
-        }, [dispatch, isDeleteSuccess, user])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [requestDelete, token])
     
         //Affichage au format prix
         const currencyLocalPrice = prix => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(prix)
 
-        const displayBtnDelete = prixtubeData => user.role > 2 
+        const displayBtnDelete = prixtubeData => role > 2 
         ? <Popup
             trigger={
                 <Button 
@@ -157,7 +158,7 @@ const PrixTubes = () => {
 
 
         //Affichage de la liste des prixtubes (data)
-        const displayData = listPrixtubes.prixtubes.map(prixtubeData => (togglePrixtubeDisable === false) 
+        const displayData = prixtubes.map(prixtubeData => (togglePrixtubeDisable === false) 
             ? prixtubeData.actif
                 ? displayTableRow(prixtubeData)
                 : null
@@ -167,7 +168,7 @@ const PrixTubes = () => {
     
     
         //Affichage de la liste des prixtubes (en-tête)
-        const displayTablePrixtubes = listPrixtubes.prixtubes.length !== 0
+        const displayTablePrixtubes = prixtubes.length !== 0
         ?   <Table className='mt-4' color='blue' inverted>
                 <Table.Header>
                     <Table.Row>
@@ -197,9 +198,9 @@ const PrixTubes = () => {
     
     
         //Affichage des états de la requête GET /prixtubes
-        const loaderPrixtubes = listPrixtubes.isLoading
+        const loaderPrixtubes = isLoading
         ? <Loader className='mt-5' loadingMsg='Chargement des prixtubes en cours...'/>
-        : listPrixtubes.error !== '' ? displayError : displayTablePrixtubes
+        : errorMsg !== '' ? displayError : displayTablePrixtubes
             
     
         //fermeture des modals
@@ -212,9 +213,9 @@ const PrixTubes = () => {
         const showModalCreate = () => setOpenModalCreate(true)
 
 
-        const loaderTypeTubes = isLoading
+        const loaderTypeTubes = listTypetubes.isLoading
         ? <Button className='me-2' disabled><Icon name='plus'/> Prix d'un tube</Button>
-        : error !== '' ? <Button className='me-2' disabled><Icon name='plus'/> Prix d'un tube</Button>
+        : errorMsg !== '' ? <Button className='me-2' disabled><Icon name='plus'/> Prix d'un tube</Button>
         : <Button className='me-2' onClick={showModalCreate}><Icon name='plus'/> Prix d'un tube</Button>
     
         
@@ -231,7 +232,7 @@ const PrixTubes = () => {
     
         const handleDelete = id => {
             setRequestDelete(true)
-            dispatch(deletePrixtube(user.token, id))
+            dispatch(deletePrixtube(token, id))
             setOpenModalDelete(false)
         }
     

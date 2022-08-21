@@ -24,6 +24,13 @@ const ModalEditPrixtube = ({hideModal, prixtubeData}) => {
     }, [prixtubeData])
 
 
+    const disableBtnConfirm = prixtubeEdit.marque.length < 2 || prixtubeEdit.marque.length > 40 || 
+    prixtubeEdit.prix <= 0.01 || prixtubeEdit.prix < prixtubeEdit.prixMembre || 
+    (prixtubeData.marque === prixtubeEdit.marque && 
+    prixtubeData.prix === prixtubeEdit.prix &&
+    prixtubeData.prixMembre === prixtubeEdit.prixMembre &&
+    prixtubeData.actif === prixtubeEdit.actif)
+
 
     const handleChangePrix = event => {
         setPrixText(event.target.value)
@@ -47,7 +54,8 @@ const ModalEditPrixtube = ({hideModal, prixtubeData}) => {
             styleAlert={{width: '460px'}}
             stateSelector={listPrixtubes}
             actionRefreshData={() => refreshAllPrixtubes(token)}
-            actionEdit={() => editPrixtube(token, prixtubeEdit)}>
+            actionEdit={() => editPrixtube(token, prixtubeEdit)}
+            disableBtnConfirm={disableBtnConfirm}>
 
             {/*children*/}
                 <Form>
@@ -99,6 +107,7 @@ const ModalEditPrixtube = ({hideModal, prixtubeData}) => {
                                     type='number'
                                     className='mb-3'
                                     placeholder='0.00'
+                                    min={0}
                                     value={prixMembreText}
                                     onChange={handleChangePrixMembre}/>
                             </Col>

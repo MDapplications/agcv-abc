@@ -4,17 +4,12 @@ import { Spinner } from 'react-bootstrap'
 const Loader = ({loadingMsg, color, isMsg}) => {
     
     const displayColor = color ? `${color}` : 'primary'
+    const activeMessage = isMsg === undefined ? true : isMsg
+    const message = loadingMsg === undefined ? 'Chargement en cours...' : loadingMsg
 
-    const activeMessage = () => {
-        if (isMsg === (undefined || null)) {
-            return true
-        }
-        return isMsg
-    }
-
-    const displayMsg = activeMessage() && 
+    const displayMsg = activeMessage && 
     <div className='mt-2'>
-        <span>{loadingMsg || 'Chargement en cours...'}</span>
+        <span>{message}</span>
     </div> 
 
     return (

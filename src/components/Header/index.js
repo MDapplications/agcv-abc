@@ -24,7 +24,8 @@ const Header = () => {
                 navigate('/')
             }
         }
-    }, [token, navigate, page])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token, page])
 
 
     //render
