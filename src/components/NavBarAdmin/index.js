@@ -6,7 +6,7 @@ import BtnLogout from '../BtnLogout'
 import './index.css'
 
 
-const NavBarAdmin = () => {
+const NavBarAdmin = ({showModalChangePassword}) => {
 
     //Redux
     const {username, role} = useSelector(state => state.user)
@@ -24,7 +24,7 @@ const NavBarAdmin = () => {
             <Container fluid>
                 
                 <div className='d-flex justify-content-start'>
-                    <div className='py-2 pe-5'>{username}</div>
+                    <div id='a-admin' className='py-2 nav-link link-dark' onClick={showModalChangePassword}>{username}</div>
                 </div>
 
                 <div className='d-flex justify-content-end'>
@@ -35,7 +35,7 @@ const NavBarAdmin = () => {
                         <Link id='a-admin' className='nav-link link-secondary' to='saisons'>Saisons</Link>  
                         <Link id='a-admin' className='nav-link link-secondary' to='membres'>Membres</Link>  
                         <Link id='a-admin' className='nav-link link-secondary' to='prixtubes'>Prix des tubes</Link>
-                        <Link id='a-admin' className='nav-link link-secondary' to='typetubes'>TypeTubes</Link>
+                        <Link id='a-admin' className='nav-link link-secondary' to='typetubes'>Types de tube</Link>
                          
                         <Link id='back-home' className='nav-link link-secondary' to='/home'>Page principale</Link>
                         

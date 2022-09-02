@@ -5,15 +5,15 @@ import { Button, Popup, Table } from 'semantic-ui-react'
 import { editConsoMois } from '../../Redux/actions/consomois'
 import { initSaisons } from '../../Redux/actions/saisons'
 
-const TableConsoMois = ({moisData, orderable}) => {
+const TableConsoMois = ({saison, moisData, orderable}) => {
 
     //Hooks
     const dispatch = useDispatch()
 
     //Redux
     const {token} = useSelector(state => state.user)
-    const {prixtubes} = useSelector(state => state.prixtubes)
     const {saisonActive} = useSelector(state => state.saisons)
+    const {prixtubes} = useSelector(state => state.prixtubes)
     const {isLoadingEdit, isEditSuccess} = useSelector(state => state.consomois)
 
     //States
@@ -22,6 +22,7 @@ const TableConsoMois = ({moisData, orderable}) => {
     const [nbTubesOrdered, setNbTubesOrdered] = useState(0)
     const [moisId, setmoisId] = useState(0)
     const [loadConsoMois, setloadConsoMois] = useState(false)
+    const [actionValid, setActionValid] = useState(true)
 
 
     useEffect(() => {if (moisId !== 0) setPrixData(0)}, [moisId])
@@ -33,6 +34,9 @@ const TableConsoMois = ({moisData, orderable}) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [loadConsoMois, isEditSuccess, token])
+    
+    useEffect(() => {if (actionValid) if (saison.id !== saisonActive.id) setActionValid(false)}, [actionValid, saison, saisonActive])
+    
 
 
     //Affichage au format prix
@@ -89,10 +93,13 @@ const TableConsoMois = ({moisData, orderable}) => {
     }
 
     const changePrixtube = () => {
-        const idTypeTube = saisonActive.ConsoVolants.filter(data => data.id === moisData.idConsoVolant)[0].idTypeTube
+        const idTypeTube = saison.ConsoVolants.filter(data => data.id === moisData.idConsoVolant)[0].idTypeTube
         const listPrixtubes = prixtubes.filter(data => data.idTypeTube === idTypeTube && data.actif === true)
-        const idPrixTube = moisData.PrixTube.id
-            
+        let idPrixTube = 0
+        if (moisData.PrixTube !== null) {
+            idPrixTube = moisData.PrixTube.id
+        }
+                        
         return (     
             <div className='d-flex justify-content-between pop-prix'>
                 
@@ -100,6 +107,7 @@ const TableConsoMois = ({moisData, orderable}) => {
                     aria-label="Selection d'un prix du tube" 
                     className='me-2'
                     defaultValue={idPrixTube}
+                    disabled={!actionValid}
                     onChange={handleChangePrix}>
                         <option value='0'>Selection d'un prix du tube</option>
                         {displayOptionsPrix(listPrixtubes)}
@@ -107,7 +115,7 @@ const TableConsoMois = ({moisData, orderable}) => {
 
                 <Button 
                 color='blue' 
-                disabled={isNaN(prixData) || prixData === 0}
+                disabled={isNaN(prixData) || prixData === 0 || !actionValid}
                 onClick={handleChangePrixMois}>
                     Modifier
                 </Button>
@@ -191,7 +199,8 @@ const TableConsoMois = ({moisData, orderable}) => {
         }
         content={changeNbTubesUsed()}
         on='click'
-        position='right center'/>
+        position='right center'
+        disabled={!actionValid}/>
 
 
     return (
@@ -200,12 +209,13 @@ const TableConsoMois = ({moisData, orderable}) => {
         {displayTubesUsed}
 
         <Table.Cell id='td-mois' textAlign='center'>
-            {currencyLocalPrice(
+            {moisData.PrixTube !== null ?
+                currencyLocalPrice(
                 (moisData.nbTubesUsed * moisData.PrixTube.prix) +
                 //(nbTubesUsedByOrder(moisData) * (moisData.PrixTube.prix - moisData.PrixTube.prixMembre)) 
                 (nbTubesUsedByOrder() * moisData.PrixTube.prix) + 
                 (nbTubesUsedByRestock() * moisData.PrixTube.prix)
-            )}
+            ) : currencyLocalPrice(0)}
         </Table.Cell>
 
         <Popup
@@ -217,24 +227,23 @@ const TableConsoMois = ({moisData, orderable}) => {
             content={changeNbTubesOrdered()}
             on='click'
             position='right center'
-        />
+            disabled={!actionValid}/>
 
 
         <Table.Cell id='td-mois' textAlign='center'>
-            {currencyLocalPrice(moisData.nbTubesOrdered * moisData.PrixTube.prix)}
+            {moisData.PrixTube !== null ? currencyLocalPrice(moisData.nbTubesOrdered * moisData.PrixTube.prix) : currencyLocalPrice(0)}
         </Table.Cell>
 
-        
+         
         <Popup
             trigger={  
                 <Table.Cell id='td-mois' className='prix' textAlign='center' onClick={() => setmoisId(moisData.id)}>
-                    {currencyLocalPrice(moisData.PrixTube.prix)}
+                    {moisData.PrixTube !== null ? currencyLocalPrice(moisData.PrixTube.prix) : currencyLocalPrice(0)}
                 </Table.Cell>
             }
             content={changePrixtube()}
             on='click'
-            position='left center'
-        />
+            position='left center'/>
         
       </Table.Row>
     )

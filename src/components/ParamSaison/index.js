@@ -150,7 +150,7 @@ const ParamSaison = () => {
                         <Col className='d-flex align-items-center'>
                             <span>
                                 {dataVolant.TypeTube.comment 
-                                ? `${dataVolant.TypeTube.name - dataVolant.TypeTube.comment}`
+                                ? `${dataVolant.TypeTube.name} - ${dataVolant.TypeTube.comment}`
                                 : dataVolant.TypeTube.name}
                             </span>
                         </Col>

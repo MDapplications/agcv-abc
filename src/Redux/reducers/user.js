@@ -1,4 +1,9 @@
-import {    GET_USER_LOADING, GET_USER_SUCCESS, GET_USER_ERROR,
+import {    GET_USER_LOADING, 
+            GET_USER_SUCCESS, 
+            GET_USER_ERROR,
+            CHANGE_PASSWORD_USER_LOADING,
+            CHANGE_PASSWORD_USER_SUCCESS,
+            CHANGE_PASSWORD_USER_ERROR,
             INIT_USER } from '../Constantes'
 
 
@@ -9,9 +14,13 @@ const initialState = {
     role: '',
     token: '',
     isLoading: false,
+    isLoadingPassword: false,
     isGetSuccess: false,
-    error: {}
+    isPasswordSuccess: false,
+    error: {},
+    errorPassword: ''
 }
+
 
 //reducer
 const reducerUser = (state=initialState, action) => {
@@ -52,6 +61,30 @@ const reducerUser = (state=initialState, action) => {
                 isLoading: false,
                 isGetSuccess: false,
                 error: action.payload
+            }
+
+        case CHANGE_PASSWORD_USER_LOADING:
+            return {
+                ...state,
+                isLoadingPassword: true,
+                isPasswordSuccess: false,
+                errorPassword: ''
+            }
+
+        case CHANGE_PASSWORD_USER_SUCCESS:
+            return {
+                ...state,
+                isLoadingPassword: false,
+                isPasswordSuccess: true,
+                errorPassword: ''
+            }
+
+        case CHANGE_PASSWORD_USER_ERROR:
+            return {
+                ...state,
+                isLoadingPassword: false,
+                isPasswordSuccess: false,
+                errorPassword: action.payload
             }
 
         case INIT_USER:

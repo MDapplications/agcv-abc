@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { getAllTypetubes } from '../../Redux/actions/typetubes'
+import ModalChangePassword from '../ModalChangePassword'
 import NavBarAdmin from '../NavBarAdmin'
 
 const Admin = () => {
@@ -14,6 +15,9 @@ const Admin = () => {
     //Hooks
     const navigate = useNavigate()
     const dispatch = useDispatch()
+
+    //States
+    const [openModalChangePassword, setOpenModalChangePassword] = useState(false)
 
     //vérification des droits d'accès
     useEffect(() => {
@@ -41,11 +45,14 @@ const Admin = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, isGetSuccess, isLoading, error])
 
+    const displayModalChangePassword = openModalChangePassword && <ModalChangePassword hideModal={() => setOpenModalChangePassword(false)}/>
+
     //render
     return (
         <>
-            <NavBarAdmin/>
+            <NavBarAdmin showModalChangePassword={() => setOpenModalChangePassword(true)}/>
             <Outlet/>
+            {displayModalChangePassword}
         </>        
     )
 }

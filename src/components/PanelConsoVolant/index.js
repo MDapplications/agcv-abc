@@ -6,7 +6,7 @@ import FooterConsoVolants from './FooterConsoVolants'
 import TableConsoMois from './TableConsoMois'
 import './index.css'
 
-const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock, orderable}) => {
+const PanelConsoVolant = ({saison, nameTypeTube, consovolant, styleStock, orderable}) => {
 
 
     //Redux
@@ -36,12 +36,11 @@ const PanelConsoVolant = ({nameTypeTube, consovolant, styleStock, orderable}) =>
     ? <Badge bg='danger'>Stock bas</Badge>
     : <Badge bg='light' text='white' style={{opacity:'0'}}>Stock bas</Badge>
 
-    const displayConsoMois = () => consovolant.ConsoMois.map(moisData => <TableConsoMois   key={moisData.id} 
-                                                                                                    moisData={moisData}
-                                                                                                    orderable={orderable}/>)
+    const displayConsoMois = () => consovolant.ConsoMois.map(moisData => (
+    <TableConsoMois key={moisData.id} saison={saison} moisData={moisData} orderable={orderable}/>))
 
     return (
-        <Col className='px-1'>
+        <Col className='px-1' xl={4} lg={5} md={6} xs={10}>
             <Card
             bg='primary'>
                 <Card.Header>

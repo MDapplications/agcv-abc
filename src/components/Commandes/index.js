@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Container, Navbar } from 'react-bootstrap'
+import { Alert, Button, Container } from 'react-bootstrap'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -12,6 +12,7 @@ import Loader from '../Loader'
 import Modal2Confirmation from '../Modal2Confirmation'
 import ModalCreateCommande from '../ModalCreateCommande'
 import ModalEditCommande from '../ModalEditCommande'
+import NavBarBack from '../NavBarBack'
 
 
 const Commandes = () => {
@@ -298,9 +299,7 @@ const Commandes = () => {
     return (
         <>
             <div>
-                <Navbar variant='light' style={{backgroundColor: '#bbbbbb'}}>
-                    <Button variant='success' className='mx-4' onClick={handleBack}>Retour</Button>
-                </Navbar>
+                <NavBarBack handleBack={handleBack}/>
                 
                 <Container className='mt-3 mb-5'>
                     <main role='main'>

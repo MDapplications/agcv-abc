@@ -12,6 +12,9 @@ import { Button } from 'react-bootstrap'
 import { Popup } from 'semantic-ui-react'
 import { initConsoVolants } from '../../Redux/actions/consovolants'
 import { initConsoMois } from '../../Redux/actions/consomois'
+import { initRestocks } from '../../Redux/actions/restocks'
+import { initCommandes } from '../../Redux/actions/commandes'
+import { initCompetitions } from '../../Redux/actions/competitions'
 
 
 const BtnLogout = () => {
@@ -31,6 +34,9 @@ const BtnLogout = () => {
         dispatch(initSaisons())
         dispatch(initConsoVolants())
         dispatch(initConsoMois())
+        dispatch(initRestocks())
+        dispatch(initCommandes())
+        dispatch(initCompetitions())
         navigate('/')
     }
 

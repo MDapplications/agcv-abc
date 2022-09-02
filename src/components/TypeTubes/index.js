@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import Loader from '../Loader'
 import './index.css'
 import ModalEditTypetube from '../ModalEditTypetube'
+import { createConsoVolant, getSaisonActive } from '../../Redux/actions/saisons'
 
 
 const TypeTubes = () => {
@@ -21,6 +22,8 @@ const TypeTubes = () => {
 
     //Redux
     const {token, role} = useSelector(state => state.user)
+    const page = useSelector(state => state.page)
+    const {saisonActive} = useSelector(state => state.saisons)
     const {typetubes, isLoading, error, errorDelete, isDeleteSuccess, isGetSuccess} = useSelector(state => state.typetubes)
 
 
@@ -32,6 +35,8 @@ const TypeTubes = () => {
     const [typetubeDelete, setTypetubeDelete] = useState({})
     const [typetubeEdit, setTypetubeEdit] = useState({})
     const [errorMsg, setErrorMsg] = useState('')
+    const [requestCreate, setRequestCreate] = useState(false)
+    const [typetubesConso, setTypetubesConso] = useState([])
 
 
     //Styles
@@ -48,13 +53,12 @@ const TypeTubes = () => {
     }
 
 
+    useEffect(() => {
+        if (page !== 'typetubes') dispatch(getPage('typetubes'))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page])
 
     
-    useEffect(() => {
-        dispatch(getPage('typetubes')) // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-
     useEffect(() => {
         if (!isLoading && !isGetSuccess && error === '') {
             dispatch(getAllTypetubes(token))
@@ -84,6 +88,7 @@ const TypeTubes = () => {
         if (requestDelete && isDeleteSuccess) {
             setRequestDelete(false)
             dispatch(refreshAllTypetubes(token))
+            dispatch(getSaisonActive(token))
 
             toast.success("Suppression du typetube réalisé avec succès !",
             {
@@ -99,8 +104,53 @@ const TypeTubes = () => {
     }, [requestDelete, isDeleteSuccess, token])
 
 
+    useEffect(() => {
+        if (requestCreate 
+            && !isLoading
+            && error === ''
+            && isGetSuccess 
+            && saisonActive !== undefined 
+            && Object.keys(saisonActive).some(key => key === 'ConsoVolants')) {
+                const listTypetubes = []
+                saisonActive.ConsoVolants.forEach(data => {
+                    listTypetubes.push(data.TypeTube)
+                })
+                setTypetubesConso(listTypetubes)
+                setRequestCreate(false)
+        } else {
+            if (requestCreate && !isLoading && !isGetSuccess && error === '') {
+                setRequestCreate(false)
+            }
+        }
+    }, [requestCreate, isGetSuccess, saisonActive, isLoading, error])
+    
 
+    const comparer = (otherArray) => {
+        return function(current){
+          return otherArray.filter(function(other){
+            return other.id === current.id
+          }).length === 0;
+        }
+    }
 
+    useEffect(() => {
+        if (typetubesConso.length > 0) {
+            if (typetubesConso.length < typetubes.length) {
+                const dataFilter = typetubes.filter(comparer(typetubesConso))
+                if (dataFilter.length > 0) {
+                    dispatch(createConsoVolant(token,{   
+                        stock: 0, 
+                        idSaison: saisonActive.id,
+                        idTypeTube: dataFilter[0].id
+                    }, {typeTubeName: 'Compétition'}))
+                    setTypetubesConso([])
+                    dispatch(getSaisonActive(token))
+                } 
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [typetubesConso, typetubes])
+    
 
     //Bontons action
     const displayAction = typeTubeData => {
@@ -123,7 +173,7 @@ const TypeTubes = () => {
                     trigger={
                         <Button 
                             variant="danger"
-                            disabled={role < 3 && typeTubeData.default}
+                            disabled={role < 3}
                             onClick={() => showModalDelete(typeTubeData)}>
                                 <Icon name='trash'/>
                         </Button>
@@ -201,13 +251,18 @@ const TypeTubes = () => {
         setOpenModalDelete(false)
         setOpenModalEdit(false)
     }
+
+    const hideModalCreate = () => {
+        hideModal()
+        setRequestCreate(true)
+    }
     
 
     const showModalCreate = () => setOpenModalCreate(true)
     
 
     //Modal de creation d'un typetube
-    const displayModalCreate = openModalCreate && <ModalCreateTypeTube hideModal={hideModal}/>
+    const displayModalCreate = openModalCreate && <ModalCreateTypeTube hideModal={hideModalCreate}/>
 
 
     //Ouverture du modal et recupération des infos

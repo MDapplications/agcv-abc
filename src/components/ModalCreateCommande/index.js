@@ -34,6 +34,7 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
 
     //States
     const [currentMonth] = useState(listMois[new Date().getMonth()])
+    const [idTypeTubeSelect, setIdTypeTubeSelect] = useState(0)
     const [commandeCreate, setCommandeCreate] = useState(initCommande)
     const [consovolant, setConsovolant] = useState(null)
     const [consomois, setConsomois] = useState(null)
@@ -50,18 +51,17 @@ const ModalCreateCommande = ({idSaison, hideModal}) => {
     }, [commandeCreate.idTypeTube, typetubesOrderable])
 
     useEffect(() => {
-        if (commandeCreate.idTypeTube !== 0) {
-            if (consovolant === null) {
-                const dataFilter = saisonActive.ConsoVolants.filter(data => data.idTypeTube === commandeCreate.idTypeTube)
-                if (dataFilter.length > 0) {
-                    setConsovolant(dataFilter[0])
-                } else {
-                    setConsovolant(null)
-                }
+        if (commandeCreate.idTypeTube !== idTypeTubeSelect) {
+            const dataFilter = saisonActive.ConsoVolants.filter(data => data.idTypeTube === commandeCreate.idTypeTube)
+            if (dataFilter.length > 0) {
+                setConsovolant(dataFilter[0])
+            } else {
+                setConsovolant(null)
             }
+            setIdTypeTubeSelect(commandeCreate.idTypeTube)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [commandeCreate.idTypeTube, saisonActive.ConsoVolants])
+    }, [commandeCreate.idTypeTube, saisonActive.ConsoVolants, idTypeTubeSelect])
     
     useEffect(() => {
         if (consovolant !== null) {

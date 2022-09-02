@@ -16,6 +16,9 @@ import {    GET_SAISONS_LOADING,
             DELETE_SAISON_LOADING,
             DELETE_SAISON_ERROR,
             DELETE_SAISON_SUCCESS,
+            TRANSFER_SAISON_LOADING,
+            TRANSFER_SAISON_SUCCESS,
+            TRANSFER_SAISON_ERROR,
             REMOVE_SAISON_ACTIVE,
             REMOVE_ALL_SAISONS} from '../Constantes'
 
@@ -173,6 +176,29 @@ const editSaisonSuccess = () => {
 }
 
 
+//En attente de réponse de l'API
+const transferSaisonLoading = () => {
+    return {
+        type: TRANSFER_SAISON_LOADING
+    }
+}
+
+//Réponse reçu
+const transferSaisonSuccess = () => {
+    return {
+        type: TRANSFER_SAISON_SUCCESS
+    }
+}
+
+
+//Réponse d'erreur
+const transferSaisonError = error => {
+    return {
+        type: TRANSFER_SAISON_ERROR,     
+        payload: error
+    }
+}
+
 
 
 
@@ -186,10 +212,31 @@ export const refreshAllSaisons = token => {
 
 
 
+//Dispatch des actions lors de la création d'un consomois
+const createStock = (token, data) => {
+    return dispatch => {
+        axios.post(
+            `${REACT_APP_AGCV_API_URL}/stocks`, data,
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(res => {
+            console.log(res.data.message)
+        })
+        .catch(err => {
+            try {
+                dispatch(createConsoVolantError(err.response.data.message))
+            } catch (error) {
+                dispatch(createConsoVolantError(err))
+            }
+        })
+    }
+}
+
+
 
 
 //Dispatch des actions lors de la création d'un consomois
-export const createConsoMois = (token, data) => {
+const createConsoMois = (token, data) => {
     return dispatch => {
         
         const {name, nbTubesUsed, nbTubesOrdered, idConsoVolant, idPrixTube} = data
@@ -221,9 +268,10 @@ export const createConsoMois = (token, data) => {
 
 
 //Dispatch des actions lors de la création d'un consovolant
-export const createConsoVolant = (token, data) => {
+export const createConsoVolant = (token, data, options) => {
     return dispatch => {
         
+        const {typeTubeName} = options
         const {stock, idSaison, idTypeTube} = data
 
         axios.post(
@@ -247,6 +295,13 @@ export const createConsoVolant = (token, data) => {
                 }
                 dispatch(createConsoMois(token, consoMoisData))
             })
+            if (typeTubeName === 'Compétition') {
+                dispatch(createStock(token,{
+                    value: 0,
+                    idSaison,
+                    idTypeTube
+                }))
+            }
         })
         .catch(err => {
             try {
@@ -258,6 +313,34 @@ export const createConsoVolant = (token, data) => {
     }
 }
 
+
+export const disableSaisonActive = (token, idSaison) => {
+    return dispatch => {
+        axios.get(
+            `${REACT_APP_AGCV_API_URL}/saisons?active=true`,
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(res => {
+            const saisonActive = res.data.data.filter(saison => saison.id !== idSaison)
+            try {
+                saisonActive.forEach(saison => {
+                    axios.put(
+                        `${REACT_APP_AGCV_API_URL}/saisons/${saison.id}`,
+                        {active: false},
+                        { headers: { "Authorization": `Bearer ${token}` } }
+                    )
+                    .then(res => {
+                        console.log(res.data.message)
+                    })
+                })
+            } catch (error) {
+                dispatch(createSaisonError('Impossible de désactiver la saison active !'))
+            } finally {
+                dispatch(createSaisonSuccess())
+            }
+        })
+    }
+}
 
 
 //Dispatch des actions lors de la création d'un saison
@@ -280,15 +363,21 @@ export const createSaison = (token, data, typetubes) => {
         )
         .then(res => {
             const idSaison = res.data.data.id
-            typetubes.forEach(typetube => {
-                const dataConsoVolant = {
-                    stock: 0,
-                    idSaison,
-                    idTypeTube: typetube.id
-                }
-                dispatch(createConsoVolant(token, dataConsoVolant))
-            })
-            dispatch(createSaisonSuccess())
+            try { 
+                typetubes.forEach(typetube => {
+                    const options = {typeTubeName: typetube.name}
+                    const dataConsoVolant = {
+                        stock: 0,
+                        idSaison,
+                        idTypeTube: typetube.id
+                    }
+                    dispatch(createConsoVolant(token, dataConsoVolant, options))
+                })
+            } catch (error) {
+                dispatch(createSaisonError('Impossible de créer les consommations de volant lié à cette nouvelle saison.'))
+            } finally {
+                dispatch(disableSaisonActive(token, idSaison))
+            }
         })
         .catch(err => {
             try {
@@ -338,17 +427,44 @@ export const editSaison = (token, data) => {
 
 
 
-export const deleteSaison = (token, id) => {
+export const deleteSaison = (token, data) => {
     return dispatch => {
 
         dispatch(deleteSaisonLoading())
 
         axios.delete(
-            `${REACT_APP_AGCV_API_URL}/saisons/${id}`,
+            `${REACT_APP_AGCV_API_URL}/saisons/${data.id}`,
             { headers: { "Authorization": `Bearer ${token}` } }
         )
-        .then(() => {
-            dispatch(deleteSaisonSuccess())
+        .then(_ => {
+            try {
+                data.Stocks.forEach(stock => {
+                    console.log('DELETE STOCK : ', stock.id)
+                    axios.delete(
+                        `${REACT_APP_AGCV_API_URL}/stocks/${stock.id}`,
+                        { headers: { "Authorization": `Bearer ${token}` } }
+                    )
+                    .catch(err => {
+                        console.log(err.response.data.message)
+                    })
+                })
+                data.ConsoVolants.forEach(consovolant => {
+                    consovolant.ConsoMois.forEach(consomois => 
+                        axios.delete(
+                            `${REACT_APP_AGCV_API_URL}/consomois/${consomois.id}`,
+                            { headers: { "Authorization": `Bearer ${token}` } }
+                        )
+                    )
+                    axios.delete(
+                        `${REACT_APP_AGCV_API_URL}/consovolants/${consovolant.id}`,
+                        { headers: { "Authorization": `Bearer ${token}` } }
+                    )               
+                })
+            } catch (error) {} 
+            finally {
+                dispatch(deleteSaisonSuccess())
+            }
+                        
         })
         .catch(err => {
             try {
@@ -374,14 +490,14 @@ export const getSaisonActive = token => {
         .then(res => {
             const saisonActive = []
             res.data.data.forEach(saison => {
-                saisonActive.push(saison)
                 const listConsoVolants = []
                 saison.ConsoVolants.forEach(consovolant => {
                     listConsoVolants.push({...consovolant,
                         ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name)),
                     })
                 })
-                saisonActive[0].ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
+                saison.ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
+                saisonActive.push(saison)
             })
             dispatch(getSaisonActiveSuccess(saisonActive[0]))
         })
@@ -410,16 +526,14 @@ export const getAllSaisons = token => {
         .then(res => {
             const listSaisons = []
             res.data.data.forEach(saison => {
-                listSaisons.push(saison)
                 const listConsoVolants = []
                 saison.ConsoVolants.forEach(consovolant => {
                     listConsoVolants.push({...consovolant,
                         ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name)),
                     })
                 })
-                listSaisons.forEach(saison => {
-                    saison.ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
-                })
+                saison.ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
+                listSaisons.push(saison)
             })
             dispatch(getSaisonsSuccess(listSaisons))
         })
@@ -430,5 +544,99 @@ export const getAllSaisons = token => {
                 dispatch(getSaisonsError(err))
             } 
         })
+    }
+}
+
+
+
+export const transferSaison = (token, saisonActive, saisonData) => {
+    return dispatch => {
+        dispatch(transferSaisonLoading())
+
+        //calcul du stock initial de la nouvelle saison en récupérant les infos de l'ancienne (saisonData)
+        saisonData.ConsoVolants.forEach(consovolant => {
+            const idConsoVolant = consovolant.id
+            const idTypeTube = consovolant.TypeTube.id
+            const typetubeName = consovolant.TypeTube.name
+            const calculConsoVolant = consovolant.ConsoMois.reduce((prevValue, data) => {
+                if (data.PrixTube !== null) {
+                    return {
+                        nbUsed: prevValue.nbUsed + data.nbTubesUsed,
+                        nbOrdered:  prevValue.nbOrdered + data.nbTubesOrdered,
+                    }
+                } else {
+                    return {
+                        nbUsed: prevValue.nbUsed + data.nbTubesUsed,
+                        nbOrdered:  prevValue.nbOrdered + data.nbTubesOrdered,
+                    }
+                }
+            }, {nbUsed:0, nbOrdered: 0})
+
+            let stock = consovolant.stock - calculConsoVolant.nbUsed + calculConsoVolant.nbOrdered
+            
+            if (typetubeName === 'Compétition') {
+                //Commandes
+                saisonData.Commandes.forEach(commande => {
+                    if (idConsoVolant === commande.ConsoMoi.idConsoVolant) {
+                        stock = stock - commande.nbTubesOrdered
+                    }
+                })
+
+                //Restocks
+                const dataStock = saisonData.Stocks.find(data => idTypeTube === data.idTypeTube)
+                dataStock.Restocks.forEach(restock => stock = stock - restock.value)
+            }
+            
+            //mise à jour du stock du consovolant
+            const dataConsoVolant = saisonActive.ConsoVolants.find(data => data.idTypeTube === idTypeTube)
+            axios.put(
+                `${REACT_APP_AGCV_API_URL}/consovolants/${dataConsoVolant.id}`,
+                { stock },
+                { headers: { "Authorization": `Bearer ${token}` } }
+            )
+            .catch(err => {
+                try {
+                    dispatch(transferSaisonError(err.response.data.message))
+                } catch(error) {
+                    dispatch(transferSaisonError(err))
+                }
+            })
+        })
+
+
+        //Récupération de la valeurs des stock pour compétitions
+        saisonData.Stocks.forEach(stock => {
+            const idTypeTube = stock.idTypeTube
+
+            let stockValue = stock.value
+            if (stock.Competitions.length > 0) {
+                stockValue = stockValue - stock.Competitions.reduce((prevValue, competition) => {
+                    return prevValue + competition.nbTubesUsed
+                }, 0)
+            }
+            if (stock.Restocks.length > 0) {
+                stockValue = stockValue + stock.Restocks.reduce((prevValue, restock) => {
+                    return prevValue + restock.value
+                }, 0)
+            }
+
+            //mise à jour du stock du consovolant
+            const dataStock = saisonActive.Stocks.find(data => data.idTypeTube === idTypeTube)
+            axios.put(
+                `${REACT_APP_AGCV_API_URL}/stocks/${dataStock.id}`,
+                { value: stockValue },
+                { headers: { "Authorization": `Bearer ${token}` } }
+            )
+            .catch(err => {
+                try {
+                    dispatch(transferSaisonError(err.response.data.message))
+                } catch(error) {
+                    dispatch(transferSaisonError(err))
+                }
+            })
+        })
+
+        dispatch(transferSaisonSuccess())
+
     }
 }

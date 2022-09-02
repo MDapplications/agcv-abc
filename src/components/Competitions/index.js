@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Container, Navbar } from 'react-bootstrap'
+import { Alert, Button, Container } from 'react-bootstrap'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -13,6 +13,7 @@ import Modal2Confirmation from '../Modal2Confirmation'
 import ModalCreateCompetition from '../ModalCreateCompetition'
 import ModalCreateRestock from '../ModalCreateRestock'
 import ModalEditCompetition from '../ModalEditCompetition'
+import NavBarBack from '../NavBarBack'
 
 const Competitions = () => {
 
@@ -319,9 +320,7 @@ const Competitions = () => {
     return (
         <>
             <div>
-                <Navbar variant='light' style={{backgroundColor: '#bbbbbb'}}>
-                    <Button variant='success' className='mx-4' onClick={handleBack}>Retour</Button>
-                </Navbar>
+                <NavBarBack handleBack={handleBack}/>
                 
                 <Container className='mt-3 mb-5'>
                     <main role='main'>

@@ -22,7 +22,6 @@ const ModalCreateTypeTube = ({hideModal}) => {
 
     //Redux
     const {token, role} = useSelector(state => state.user)
-    const {saisonActive} = useSelector(state => state.saisons)
     const listTypetubes = useSelector(state => state.typetubes)
 
 

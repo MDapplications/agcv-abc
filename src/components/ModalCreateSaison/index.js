@@ -28,12 +28,16 @@ const ModalCreateSaison = ({hideModal}) => {
 
 
     useEffect(() => {
-        setSaisonCreate({...saisonCreate, budget: Number(budgetText)})
+        if (saisonCreate.budget === initSaison.budget) {
+            setSaisonCreate({...saisonCreate, budget: Number(budgetText)})
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [budgetText, saisonCreate])
 
     useEffect(() => {
-        setSaisonCreate({...saisonCreate, anneeFin: saisonCreate.anneeDebut + 1})
+        if (saisonCreate.anneeFin === initSaison.anneeFin || saisonCreate.anneeFin !== saisonCreate.anneeDebut + 1) {
+            setSaisonCreate({...saisonCreate, anneeFin: saisonCreate.anneeDebut + 1})
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [saisonCreate.anneeDebut])
   

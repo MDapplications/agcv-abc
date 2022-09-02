@@ -22,6 +22,7 @@ const PrixTubes = () => {
 
         //Redux
         const {token, role} = useSelector(state => state.user)
+        const page = useSelector(state => state.page)
         const {prixtubes, isDeleteSuccess, isGetSuccess, error, errorDelete, isLoading} = useSelector(state => state.prixtubes)
         const listTypetubes = useSelector(state => state.typetubes)
 
@@ -49,8 +50,11 @@ const PrixTubes = () => {
             backgroundColor: '#fcebf0',
             color: '#e42558'
         }
-            
-        useEffect(() => {dispatch(getPage('prixtubes'))}, [dispatch])
+
+        useEffect(() => {
+            if (page !== 'prixtubes') dispatch(getPage('prixtubes'))
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [page])
             
         useEffect(() => {
             if (!isLoading && !isGetSuccess && error === '') {

@@ -15,16 +15,22 @@ import {    GET_SAISONS_LOADING,
             DELETE_SAISON_LOADING,
             DELETE_SAISON_ERROR,
             DELETE_SAISON_SUCCESS,
+            TRANSFER_SAISON_LOADING,
+            TRANSFER_SAISON_SUCCESS,
+            TRANSFER_SAISON_ERROR,
             REMOVE_SAISON_ACTIVE,
             REMOVE_ALL_SAISONS} from '../Constantes'
 
-
+            
 const initialState = {
     isLoading: false,
     isLoadingGetActive: false,
     isLoadingCreate: false,
     isLoadingDelete: false,
     isLoadingEdit: false,
+    isLoadingTransfer: false,
+    isTransferSuccess: false,
+    isGetSuccess: false,
     isGetSaisonActiveSuccess: false,
     isCreateSuccess: false,
     isEditSuccess: false,
@@ -35,7 +41,8 @@ const initialState = {
     errorGetActive: '',
     errorCreate: '',
     errorDelete: '',
-    errorEdit: ''
+    errorEdit: '',
+    errorTransfer: '',
 }
 
 
@@ -49,6 +56,7 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: true,
+                isGetSuccess: false,
                 saisons: [],
                 error: ''
             }
@@ -57,6 +65,7 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: true,
                 saisons: action.payload,
                 error: ''
             }
@@ -65,6 +74,7 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false,
+                isGetSuccess: false,
                 saisons: [],
                 error: action.payload
             }
@@ -104,6 +114,7 @@ const reducerSaisons = (state=initialState, action) => {
                 ...state,
                 isLoadingCreate: true,
                 isCreateSuccess: false,
+                isGetSuccess: false,
                 errorCreate: ''
             }
 
@@ -111,6 +122,7 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoadingCreate: false,
+                isCreateSuccess: false,
                 errorCreate: action.payload
             }
 
@@ -119,13 +131,15 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoadingCreate: false,
-                isCreateSuccess: true
+                isCreateSuccess: true,
+                errorCreate: ''
             }
 
         case CREATE_SAISON_CONSOVOLANT_ERROR:
             return {
                 ...state,
                 isLoadingCreate: false,
+                isCreateSuccess: false,
                 errorCreate: action.payload
             }
 
@@ -133,6 +147,7 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoadingCreate: false,
+                isCreateSuccess: false,
                 errorCreate: action.payload
             }
 
@@ -172,6 +187,7 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoadingEdit: false,
+                isEditSuccess: false,
                 errorEdit: action.payload
             }
 
@@ -179,7 +195,8 @@ const reducerSaisons = (state=initialState, action) => {
             return {
                 ...state,
                 isLoadingEdit: false,
-                isEditSuccess: true
+                isEditSuccess: true,
+                errorEdit: ''
             }
 
         case REMOVE_SAISON_ACTIVE:
@@ -188,6 +205,31 @@ const reducerSaisons = (state=initialState, action) => {
                 isLoadingGetActive: false,
                 saisonActive: {},
                 errorGetActive: ''
+            }
+
+        //TRANSFER
+        case TRANSFER_SAISON_LOADING:
+            return {
+                ...state,
+                isLoadingTransfer: true,
+                isTransferSuccess: false,
+                errorTransfer: ''
+            }
+
+        case TRANSFER_SAISON_SUCCESS:
+            return {
+                ...state,
+                isLoadingTransfer: false,
+                isTransferSuccess: true,
+                errorTransfer: ''
+            }
+
+        case TRANSFER_SAISON_ERROR:
+            return {
+                ...state,
+                isLoadingTransfer: false,
+                isTransferSuccess: false,
+                errorTransfer: action.payload
             }
 
         //REMOVE_ALL

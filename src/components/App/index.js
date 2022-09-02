@@ -4,7 +4,6 @@ import Login from '../Login'
 import Home from '../Home'
 import ErrorPage from '../ErrorPage'
 import Header from '../Header'
-import Footer from '../Footer'
 import SignUp from '../SignUp'
 import ResumeSaison from '../ResumeSaison'
 import ConsoVolants from '../ConsoVolants'
@@ -24,37 +23,39 @@ import Competitions from '../Competitions'
 const App = () => {
   return (
     <Router>
-      <Header/> 
- 
-         <Routes>
-          <Route path="/" element={<Login/>}/>
+        <Header/> 
+    
+            <Routes>
+                <Route path="/" element={<Login/>}/>
 
-          <Route path='/signup' element={<SignUp/>}/>
-         
-          <Route path="/saison/:anneeDebut" element={<HistoSaison/>}/>
-          
-          <Route path="/home" element={<Home/>}>
-            <Route index element={<ResumeSaison/>}/>
-            <Route path="consoVolants" element={<ConsoVolants/>}/>
-            <Route path="consoTests" element={<ConsoTests/>}/>
-          </Route>
- 
-          <Route path="/commandes/:idSaison" element={<Commandes/>}/>
-          <Route path="/competitions/:idSaison" element={<Competitions/>}/>
+                <Route path='/signup' element={<SignUp/>}/>
+                        
+                <Route path="/home" element={<Home/>}>
+                    <Route index element={<ResumeSaison/>}/>
+                    <Route path="consoVolants" element={<ConsoVolants/>}/>
+                    <Route path="consoTests" element={<ConsoTests/>}/>
+                </Route>
+    
+                <Route path="/commandes/:idSaison" element={<Commandes/>}/>
+                <Route path="/competitions/:idSaison" element={<Competitions/>}/>
 
-          <Route path="/admin" element={<Admin/>}>
-            <Route index element={<ParamSaison/>}/>
-            <Route path="saisons" element={<Saisons/>}/>
-            <Route path="membres" element={<Membres/>}/>
-            <Route path="prixtubes" element={<PrixTubes/>}/>
-            <Route path="users" element={<Utilisateurs/>}/>
-            <Route path="typetubes" element={<TypeTubes/>}/>
-          </Route>
- 
-          <Route path='*' element={<ErrorPage/>}/>
-        </Routes>
+                <Route path="/admin" element={<Admin/>}>
+                    <Route index element={<ParamSaison/>}/>
+                    <Route path="saisons" element={<Saisons/>}/>
+                    <Route path="membres" element={<Membres/>}/>
+                    <Route path="prixtubes" element={<PrixTubes/>}/>
+                    <Route path="users" element={<Utilisateurs/>}/>
+                    <Route path="typetubes" element={<TypeTubes/>}/>
+                </Route>
 
-      <Footer/> 
+                <Route path="saison/:idSaison" element={<HistoSaison/>}>
+                    <Route index element={<ResumeSaison/>}/>
+                    <Route path="consoVolants" element={<ConsoVolants/>}/>
+                    <Route path="consoTests" element={<ConsoTests/>}/>
+                </Route>
+
+                <Route path='*' element={<ErrorPage/>}/>
+            </Routes>
       
     </Router>
   )
