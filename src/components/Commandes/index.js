@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, Container } from 'react-bootstrap'
+import { Alert, Button, Container, Form } from 'react-bootstrap'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Icon, Popup, Table } from 'semantic-ui-react'
+import { Icon, Popup, Table as TableSUI } from 'semantic-ui-react'
 import { deleteCommande, refreshAllCommandes } from '../../Redux/actions/commandes'
 import { refreshAllMembres } from '../../Redux/actions/membres'
 import { initSaisons } from '../../Redux/actions/saisons'
@@ -13,6 +13,8 @@ import Modal2Confirmation from '../Modal2Confirmation'
 import ModalCreateCommande from '../ModalCreateCommande'
 import ModalEditCommande from '../ModalEditCommande'
 import NavBarBack from '../NavBarBack'
+import { commandes as header } from '../../data/headers'
+import Table from '../Table'
 
 
 const Commandes = () => {
@@ -58,19 +60,40 @@ const Commandes = () => {
     const [requestDelete, setRequestDelete] = useState(false)
     const [commandeDelete, setCommandeDelete] = useState({})
     const [commandeEdit, setCommandeEdit] = useState({})
-
+    const [listMembres, setlistMembres] = useState([])
+    const [idMembreOrder, setidMembreOrder] = useState(0)
 
 
     useEffect(() => {
-    if (token !== '') {
+    if (token !== '' && saisonSelect.id > 0) {
         dispatch(refreshAllCommandes(token, idSaison))
         dispatch(refreshAllMembres(token))
         dispatch(getTypetubesOrderable(token))
+        setloadCommandes(false)
+        setlistMembres([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token, idSaison])
+    }, [token, idSaison, saisonSelect])
 
-    useEffect(() => {if (isGetSuccess && !isLoading) setloadCommandes(true)}, [isGetSuccess, isLoading])
+    useEffect(() => {
+        if (isGetSuccess && !isLoading && !loadCommandes) {
+            let lsMembres = [{id: 0, name: "Voir toutes les commandes"}]            
+            if (commandes.length > 0) {
+                commandes.forEach(order => {
+                    let unique = true
+                    lsMembres.forEach(membre => {
+                        if (membre.id === order.Membre.id) {
+                            unique = false
+                        }
+                    })
+                    if (unique) lsMembres.push({id: order.Membre.id, name: order.Membre.prenom + ' ' + order.Membre.nom})
+                }) 
+            }
+            setloadCommandes(true)
+            setlistMembres(lsMembres)
+        }
+    }, [isGetSuccess, isLoading, loadCommandes, commandes, listMembres, saisonSelect, idSaison])
+    
     useEffect(() => {if (!isLoading && error !== '') setShowError(true)}, [error, isLoading])
     useEffect(() => {if (saisonActive.id === Number(idSaison)) {
             setEnableActions(true)
@@ -214,85 +237,98 @@ const Commandes = () => {
         )
     }
 
+    const optionSelectMembre = listeMembres => listeMembres.length > 0 && listeMembres.map(membre => 
+        <option 
+            key={membre.id} 
+            value={membre.id}>
+                {membre.name}
+        </option>
+    )
+
+    const handleMembre = event => setidMembreOrder(Number(event.target.value))
 
     const displayBoolean = value => value ? <Icon name='check' /> : <Icon name='times' />
 
     const activeStyleStatus = data => !data.status ? styleStatusFalse : null
+        
+    const dataTableRow = data => (
+        <TableSUI.Row id='row-commandes' key={data.id} active={data.status}>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {new Date(data.horodatage).toLocaleDateString()}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {data.Membre.prenom + ' ' + data.Membre.nom}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {data.ConsoMoi.name}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {data.PrixTube.TypeTube.comment === '' 
+                        ? data.PrixTube.TypeTube.name 
+                        : data.PrixTube.TypeTube.name + ' - ' + data.PrixTube.TypeTube.comment}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {data.PrixTube.marque}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {data.nbTubesOrdered}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {currencyLocalPrice(data.nbTubesOrdered*data.PrixTube.prixMembre)}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {displayBoolean(data.status)}
+                    </TableSUI.Cell>
+                    <TableSUI.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
+                        {displayAction(data)}
+                    </TableSUI.Cell>
+                </TableSUI.Row>
+    )
 
     const displayData = commandes.map(data => {
-        return (
-            <Table.Row id='row-commandes' key={data.id} active={data.status}>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {new Date(data.horodatage).toLocaleDateString()}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {data.Membre.prenom + ' ' + data.Membre.nom}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {data.ConsoMoi.name}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {data.PrixTube.TypeTube.comment === '' 
-                    ? data.PrixTube.TypeTube.name 
-                    : data.PrixTube.TypeTube.name + ' - ' + data.PrixTube.TypeTube.comment}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {data.PrixTube.marque}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {data.nbTubesOrdered}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {currencyLocalPrice(data.nbTubesOrdered*data.PrixTube.prixMembre)}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {displayBoolean(data.status)}
-                </Table.Cell>
-                <Table.Cell className='align-middle' textAlign='center' style={activeStyleStatus(data)}>
-                    {displayAction(data)}
-                </Table.Cell>
-            </Table.Row>
-        )
+        if (idMembreOrder === 0) {
+            return dataTableRow(data)
+        } else {
+            if (idMembreOrder === data.Membre.id) {
+                return dataTableRow(data)
+            } else {return null}
+        }
     })
-
+    
     const displayTableCommandes = (
-    <Table className='mt-4' color='blue' inverted>
-        <Table.Header>
-            <Table.Row>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Date</Table.HeaderCell>
-                <Table.HeaderCell textAlign='center'>Membre</Table.HeaderCell>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Mois</Table.HeaderCell>
-                <Table.HeaderCell textAlign='center'>Type du tube</Table.HeaderCell>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Marque</Table.HeaderCell>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '80px'}}>Nb de tube</Table.HeaderCell>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '80px'}}>Prix</Table.HeaderCell>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '80px'}}>Réglée</Table.HeaderCell>
-                <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actions</Table.HeaderCell>
-            </Table.Row>
-        </Table.Header>
-
-        <Table.Body style={{borderStyle: 'none'}}>{displayData}</Table.Body>
-    </Table>
+        <Table 
+            table={{className: 'mt-4', color: 'blue'}}
+            body={{style: {borderStyle: 'none'}}}
+            header={header}
+            displayData={displayData}/>
     )
 
 
-    const displaylistCommandes = () => {if (!showError && !loadCommandes) {
-        return <Loader/>
-    } else if (loadCommandes && !showError) {
-        if (commandes.length === 0) {
-            return <p className='mt-4'>Aucune commande pour cette saison.</p>
-        } else {
-            return displayTableCommandes
-        }
-    } else return <Alert variant='danger'>{error + errorDelete}</Alert>}
+    const displaylistCommandes = !showError && !loadCommandes
+    ? <Loader className='mt-5' loadingMsg='Chargement des commandes en cours...'/>
+    : loadCommandes && !showError
+        ? commandes.length === 0
+            ? <p className='mt-4'>Aucune commande pour cette saison.</p>
+            : displayTableCommandes
+        : <Alert variant='danger'>{error + errorDelete}</Alert>
 
 
-    const displaySaisonActive = enableActions && <> 
-        <hr/>
-        <div className='d-flex justify-content-start'>
-            <Button className='me-2' onClick={showModalCreate}><Icon name='plus'/> Commande</Button>
-        </div>
-    </>
+    const displaySaisonActive = enableActions &&    
+    <Button className='me-4' onClick={showModalCreate}>
+        <Icon name='plus'/> Commande
+    </Button>
+
+    const displaySelectMembre = loadCommandes && listMembres.length > 0 
+    ? <span className='d-flex justify-content-start align-middle'>
+        <Form.Label className='mt-2 me-2' style={{width: '60px'}}>Filtre :</Form.Label>
+        <Form.Select 
+            aria-label="Selection d'un membre" 
+            defaultValue='0'
+            onChange={handleMembre}>
+                {optionSelectMembre(listMembres)}
+        </Form.Select>
+    </span>
+    : <Loader isMsg={false}/>
 
 
     //render
@@ -308,12 +344,16 @@ const Commandes = () => {
                                 <div className='display-6'>
                                     Commandes de la saison : {saisonSelect.anneeDebut + ' - ' + saisonSelect.anneeFin}
                                 </div>
-                                {displaySaisonActive}
+                                <hr/>
+                                <div className='d-flex justify-content-start'>
+                                    {displaySaisonActive}
+                                    {displaySelectMembre}
+                                </div>
                             </Container>
                         </div>
                     </main>
 
-                    {displaylistCommandes()}
+                    {displaylistCommandes}
 
                 </Container>
             </div>

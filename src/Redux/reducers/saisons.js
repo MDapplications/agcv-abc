@@ -1,6 +1,9 @@
 import {    GET_SAISONS_LOADING,
             GET_SAISONS_SUCCESS,
             GET_SAISONS_ERROR,
+            GET_SAISON_LOADING,
+            GET_SAISON_SUCCESS,
+            GET_SAISON_ERROR,
             GET_SAISON_ACTIVE_LOADING,
             GET_SAISON_ACTIVE_SUCCESS,
             GET_SAISON_ACTIVE_ERROR,
@@ -24,6 +27,7 @@ import {    GET_SAISONS_LOADING,
             
 const initialState = {
     isLoading: false,
+    isLoadingGet: false,
     isLoadingGetActive: false,
     isLoadingCreate: false,
     isLoadingDelete: false,
@@ -31,13 +35,16 @@ const initialState = {
     isLoadingTransfer: false,
     isTransferSuccess: false,
     isGetSuccess: false,
+    isGetSaisonSuccess: false,
     isGetSaisonActiveSuccess: false,
     isCreateSuccess: false,
     isEditSuccess: false,
     isDeleteSuccess: false,
     saisonActive: {},
     saisons: [],
+    saison: {},
     error: '',
+    errorGet: '',
     errorGetActive: '',
     errorCreate: '',
     errorDelete: '',
@@ -51,7 +58,7 @@ const reducerSaisons = (state=initialState, action) => {
 
     switch (action.type) {
 
-        //GET
+        //GET SAISONS
         case GET_SAISONS_LOADING:
             return {
                 ...state,
@@ -78,6 +85,35 @@ const reducerSaisons = (state=initialState, action) => {
                 saisons: [],
                 error: action.payload
             }
+ 
+        //GET SAISON
+        case GET_SAISON_LOADING:
+            return {
+                ...state,
+                isLoadingGet: true,
+                isGetSaisonSuccess: false,
+                saison: {},
+                errorGet: ''
+            }
+
+        case GET_SAISON_SUCCESS:
+            localStorage.setItem('saison', JSON.stringify(action.payload))
+            return {
+                ...state,
+                isLoadingGet: false,
+                isGetSaisonSuccess: true,
+                saison: action.payload,
+                errorGet: ''
+            }
+
+        case GET_SAISON_ERROR:
+            return {
+                ...state,
+                isLoadingGet: false,
+                isGetSaisonSuccess: false,
+                saison: {},
+                errorGet: action.payload
+            }
 
         //GET ACTIVE
         case GET_SAISON_ACTIVE_LOADING:
@@ -90,6 +126,7 @@ const reducerSaisons = (state=initialState, action) => {
             }
 
         case GET_SAISON_ACTIVE_SUCCESS:
+            localStorage.setItem('saisonActive', JSON.stringify(action.payload))
             return {
                 ...state,
                 isLoadingGetActive: false,

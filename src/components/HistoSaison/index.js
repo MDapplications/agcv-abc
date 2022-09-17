@@ -3,7 +3,7 @@ import { Container } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, Outlet, useNavigate, useParams } from 'react-router-dom'
 import { getPage } from '../../Redux/actions/pages'
-import { getAllSaisons } from '../../Redux/actions/saisons'
+import { getSaison } from '../../Redux/actions/saisons'
 import { addStock, initStocks, setStock } from '../../Redux/actions/stocks'
 import Loader from '../Loader'
 import NavBarBack from '../NavBarBack'
@@ -20,10 +20,11 @@ const HistoSaison = () => {
     //Redux
     const {token} = useSelector(state => state.user)
     const stocks = useSelector(state => state.stocks)
-    const {saisons, isLoading, isGetSuccess, error} = useSelector(state => state.saisons)
+    const {saison, isLoadingGet, isGetSaisonSuccess} = useSelector(state => state.saisons)
 
     //States
     const [saisonSelect, setSaisonSelect] = useState(null)
+    const [requestGet, setRequestGet] = useState(false)
 
 
     useEffect(() => {
@@ -31,20 +32,34 @@ const HistoSaison = () => {
         dispatch(initStocks())
     }, [dispatch])
 
-    
     useEffect(() => {
-        if (saisonSelect === (undefined || null) && saisons.length > 0) {
-            const dataFilter = saisons.filter(data => data.id === Number(idSaison))
-            setSaisonSelect(dataFilter[0])
-        }
-    }, [saisons, idSaison, saisonSelect])
+        if(!localStorage.getItem('saison')) {
+            if (!isLoadingGet && !requestGet) {
+                setRequestGet(true)
+                dispatch(getSaison(token, Number(idSaison)))
+            }
+        } else {
+            const localSaison = JSON.parse(localStorage.getItem('saison'))
+            if (localSaison.id !== Number(idSaison)) {
+                if (!isLoadingGet && !requestGet) {
+                    setRequestGet(true)
+                    dispatch(getSaison(token, Number(idSaison)))
+                }
+            } else {
+                setSaisonSelect(localSaison)
+            }
+        }     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoadingGet, token, requestGet])
 
     useEffect(() => {
-        if (saisons.length === 0 && !isLoading && !isGetSuccess && error === '') {
-            dispatch(getAllSaisons(token))
+        if (saisonSelect === (undefined || null) && !isLoadingGet && isGetSaisonSuccess && requestGet) {
+            setSaisonSelect(saison)
+            setRequestGet(false)
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [saisons, isLoading, isGetSuccess, error, token])
+    }, [saison, idSaison, saisonSelect, isLoadingGet, isGetSaisonSuccess, requestGet])
+
+
 
     useEffect(() => {
         if (saisonSelect !== null) {

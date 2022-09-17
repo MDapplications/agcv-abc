@@ -2,6 +2,9 @@ import axios from 'axios'
 import {    GET_SAISONS_LOADING,
             GET_SAISONS_SUCCESS,
             GET_SAISONS_ERROR,
+            GET_SAISON_LOADING,
+            GET_SAISON_SUCCESS,
+            GET_SAISON_ERROR,
             GET_SAISON_ACTIVE_LOADING,
             GET_SAISON_ACTIVE_SUCCESS,
             GET_SAISON_ACTIVE_ERROR,
@@ -66,6 +69,29 @@ const getSaisonsError = error => {
     }
 }
 
+//En attente de réponse de l'API
+const getSaisonLoading = () => {
+    return {
+        type: GET_SAISON_LOADING
+    }
+}
+
+//Réponse reçu
+const getSaisonSuccess = data => {
+    return {
+        type: GET_SAISON_SUCCESS,     
+        payload: data  
+    }
+}
+
+
+//Réponse d'erreur
+const getSaisonError = error => {
+    return {
+        type: GET_SAISON_ERROR,     
+        payload: error
+    }
+}
 
 //En attente de réponse de l'API
 const getSaisonActiveLoading = () => {
@@ -512,7 +538,39 @@ export const getSaisonActive = token => {
     }
 }
 
+export const getSaison = (token, id) => {
+    return dispatch => {
 
+        dispatch(getSaisonLoading())
+        console.log('getSaisonLoading')
+
+        axios.get(
+            `${REACT_APP_AGCV_API_URL}/saisons/${id}`,
+            { headers: { "Authorization": `Bearer ${token}` } }
+        )
+        .then(res => {
+            console.log('getSaisonThen')
+            const saison = res.data.data
+                const listConsoVolants = []
+                saison.ConsoVolants.forEach(consovolant => {
+                    listConsoVolants.push({...consovolant,
+                        ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name)),
+                    })
+                })
+                saison.ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
+            dispatch(getSaisonSuccess(saison))
+        })
+        .catch(err => {
+            console.log('getSaison - ERROR !!')
+            try {
+                dispatch(getSaisonError(err.response.data.message))
+            } catch (error) {
+                dispatch(getSaisonError(err))
+            } 
+        })
+
+    }
+}
 
 export const getAllSaisons = token => {
     return dispatch => {
@@ -526,13 +584,6 @@ export const getAllSaisons = token => {
         .then(res => {
             const listSaisons = []
             res.data.data.forEach(saison => {
-                const listConsoVolants = []
-                saison.ConsoVolants.forEach(consovolant => {
-                    listConsoVolants.push({...consovolant,
-                        ConsoMois: consovolant.ConsoMois.sort((a, b) => listMois.indexOf(a.name) - listMois.indexOf(b.name)),
-                    })
-                })
-                saison.ConsoVolants = listConsoVolants.sort((a, b) => a.id - b.id)
                 listSaisons.push(saison)
             })
             dispatch(getSaisonsSuccess(listSaisons))

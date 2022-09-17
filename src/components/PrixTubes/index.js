@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Container } from 'react-bootstrap'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
-import { Icon, Popup, Table } from 'semantic-ui-react'
+import { Icon, Popup, Table as TableSUI} from 'semantic-ui-react'
 import { getPage } from '../../Redux/actions/pages'
 import { deletePrixtube, getAllPrixtubes, refreshAllPrixtubes } from '../../Redux/actions/prixtubes'
 import { getAllTypetubes } from '../../Redux/actions/typetubes'
@@ -11,7 +11,9 @@ import Loader from '../Loader'
 import Modal2Confirmation from '../Modal2Confirmation'
 import ModalCreatePrixtube from '../ModalCreatePrixtube'
 import ModalEditPrixtube from '../ModalEditPrixtube'
+import { prixtubes as header } from '../../data/headers'
 import './index.css'
+import Table from '../Table'
 
 
 const PrixTubes = () => {
@@ -146,17 +148,17 @@ const PrixTubes = () => {
     
         const displayTableRow = (data) => {
             return (
-                <Table.Row id='row-prixtubes' key={data.id} active>
-                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='left'>
+                <TableSUI.Row id='row-prixtubes' key={data.id} active>
+                    <TableSUI.Cell id='cell-prixtubes' className='align-middle' textAlign='left'>
                         {data.TypeTube.name + (data.TypeTube.comment ? ` (${data.TypeTube.comment})` : '')}
-                    </Table.Cell>
-                    <Table.Cell id='cell-prixtubes' className='align-middle'>{data.marque}</Table.Cell>
-                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{currencyLocalPrice(data.prix)}</Table.Cell>
-                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{currencyLocalPrice(data.prixMembre)}</Table.Cell>
-                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{new Date(data.horodatage).toLocaleString()}</Table.Cell>
-                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{displayBoolean(data.actif)}</Table.Cell>
-                    <Table.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{displayAction(data)}</Table.Cell>
-                </Table.Row>
+                    </TableSUI.Cell>
+                    <TableSUI.Cell id='cell-prixtubes' className='align-middle'>{data.marque}</TableSUI.Cell>
+                    <TableSUI.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{currencyLocalPrice(data.prix)}</TableSUI.Cell>
+                    <TableSUI.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{currencyLocalPrice(data.prixMembre)}</TableSUI.Cell>
+                    <TableSUI.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{new Date(data.horodatage).toLocaleString()}</TableSUI.Cell>
+                    <TableSUI.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{displayBoolean(data.actif)}</TableSUI.Cell>
+                    <TableSUI.Cell id='cell-prixtubes' className='align-middle' textAlign='center'>{displayAction(data)}</TableSUI.Cell>
+                </TableSUI.Row>
             )
         }
 
@@ -173,22 +175,11 @@ const PrixTubes = () => {
     
         //Affichage de la liste des prixtubes (en-tête)
         const displayTablePrixtubes = prixtubes.length !== 0
-        ?   <Table className='mt-4' color='blue' inverted>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell textAlign='left' collapsing style={{width: '220px'}}>Type</Table.HeaderCell>
-                        <Table.HeaderCell textAlign='left'>Marque</Table.HeaderCell>
-                        <Table.HeaderCell collapsing textAlign='center' style={{width: '110px'}}>Prix (club)</Table.HeaderCell>
-                        <Table.HeaderCell collapsing textAlign='center' style={{width: '110px'}}>Prix (membre)</Table.HeaderCell>
-                        <Table.HeaderCell collapsing textAlign='center' style={{width: '200px'}}>horodatage</Table.HeaderCell>
-                        <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actif</Table.HeaderCell>
-                        <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actions</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-    
-                <Table.Body style={{borderStyle: 'none'}}>{displayData}</Table.Body>
-                
-            </Table>
+        ?   <Table 
+                table={{className: 'mt-4 me-5', color: 'blue'}}
+                body={{style: {borderStyle: 'none'}}}
+                header={header}
+                displayData={displayData}/>
         : <div className='mt-4'>Aucun prix de tube à afficher.</div>
     
     

@@ -3,16 +3,17 @@ import { Button, Container } from 'react-bootstrap'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Icon, Popup, Table } from 'semantic-ui-react'
+import { Icon, Popup, Table as TableSUI } from 'semantic-ui-react'
 import { getPage } from '../../Redux/actions/pages'
 import { deleteSaison, getAllSaisons, getSaisonActive, initSaisonActive, initSaisons } from '../../Redux/actions/saisons'
 import AlertDanger from '../AlertDanger'
-import Loader from '../Loader'
 import Modal2Confirmation from '../Modal2Confirmation'
 import ModalCreateSaison from '../ModalCreateSaison'
 import ModalEditSaison from '../ModalEditSaison'
 import ModalTransferSaison from '../ModalTransferSaison'
-
+import Loader from '../Loader'
+import { saisons as header } from '../../data/headers'
+import Table from '../Table'
 
 
 const Saisons = () => {
@@ -161,7 +162,7 @@ const Saisons = () => {
                         <Button 
                             className='me-2' 
                             variant="success"
-                            disabled={role < 2 || saisonData.id === idSaisonActive} 
+                            disabled={role < 2 || saisonData.active} 
                             onClick={() => handleView(saisonData.id)}>
                                 <Icon name='eye'/>
                         </Button>
@@ -193,32 +194,24 @@ const Saisons = () => {
     //Affichage de la liste des prixtubes (data)
     const displayData = saisons.map(data => {
         return (
-            <Table.Row id='row-saisons' key={data.id} active>
-                <Table.Cell id='cell-saisons' className='align-middle' textAlign='left'>{data.anneeDebut + ' - ' + data.anneeFin}</Table.Cell>
-                <Table.Cell id='cell-saisons' className='align-middle' textAlign='center'>{currencyLocalPrice(data.budget)}</Table.Cell>
-                <Table.Cell id='cell-saisons' className='align-middle' textAlign='right'>{new Date(data.dateCreation).toLocaleString()}</Table.Cell>
-                <Table.Cell id='cell-saisons' className='align-middle' textAlign='center'>{displayBoolean(data.active)}</Table.Cell>
-                <Table.Cell id='cell-saisons' className='align-middle' textAlign='center'>{displayAction(data)}</Table.Cell>
-            </Table.Row>
+            <TableSUI.Row id='row-saisons' key={data.id} active>
+                <TableSUI.Cell id='cell-saisons' className='align-middle' textAlign='left'>{data.anneeDebut + ' - ' + data.anneeFin}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-saisons' className='align-middle' textAlign='center'>{currencyLocalPrice(data.budget)}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-saisons' className='align-middle' textAlign='right'>{new Date(data.dateCreation).toLocaleString()}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-saisons' className='align-middle' textAlign='center'>{displayBoolean(data.active)}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-saisons' className='align-middle' textAlign='center'>{displayAction(data)}</TableSUI.Cell>
+            </TableSUI.Row>
         )
     })
 
 
     const displayTableSaisons = saisons.length !== 0
-    ?   <Table className='mt-4' color='blue' inverted>
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell collapsing style={{width: '120px'}}>Saison</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '100px'}}>Budget</Table.HeaderCell>
-                    <Table.HeaderCell textAlign='right'>Créé le</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Active</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '180px'}}>Actions</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
+    ?   <Table 
+            table={{className: 'mt-4', color: 'blue'}}
+            body={{style: {borderStyle: 'none'}}}
+            header={header}
+            displayData={displayData}/>
 
-            <Table.Body style={{borderStyle: 'none'}}>{displayData}</Table.Body>
-            
-        </Table>
     : <div className='mt-4'>Aucune saison à afficher.</div>
 
 
@@ -338,6 +331,7 @@ const Saisons = () => {
                                 <Button variant='success' onClick={handleTransfer} disabled={!isGetSuccess || role < 2 || saisonActive === undefined}>
                                     <Icon name='sync alternate'/> Transfert de saison
                                 </Button>
+                                <span className='ms-3 mt-2'>Faire un transfert de saison juste après en avoir créé une nouvelle.</span>
                             </div>
                         </Container>
                     </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Container } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { Icon, Popup, Table } from 'semantic-ui-react'
+import { Icon, Popup, Table as TableSUI } from 'semantic-ui-react'
 import { getPage } from '../../Redux/actions/pages'
 import { deleteMembre, getAllMembres, refreshAllMembres } from '../../Redux/actions/membres'
 import toast from 'react-hot-toast'
@@ -10,7 +10,9 @@ import Loader from '../Loader'
 import ModalCreateMembre from '../ModalCreateMembre'
 import ModalEditMembre from '../ModalEditMembre'
 import Modal2Confirmation from '../Modal2Confirmation'
+import { membres as header } from '../../data/headers'
 import './index.css'
+import Table from '../Table'
 
 
 
@@ -142,17 +144,15 @@ const Membres = () => {
 
     const displayTableRow = (data) => {
         return (
-            <Table.Row id='row-membres' key={data.id} active>
-                <Table.Cell id='cell-membres' className='align-middle'>{data.id}</Table.Cell>
-                <Table.Cell id='cell-membres' className='align-middle' textAlign='center'>{data.prenom}</Table.Cell>
-                <Table.Cell id='cell-membres' className='align-middle' textAlign='center'>{data.nom}</Table.Cell>
-                <Table.Cell id='cell-membres' className='align-middle' textAlign='right'>{new Date(data.horodatage).toLocaleString()}</Table.Cell>
-                <Table.Cell id='cell-membres' className='align-middle' textAlign='center'>{displayBoolean(data.actif)}</Table.Cell>
-                <Table.Cell id='cell-membres' className='align-middle' textAlign='center'>{displayAction(data)}</Table.Cell>
-            </Table.Row>
+            <TableSUI.Row id='row-membres' key={data.id} active>
+                <TableSUI.Cell id='cell-membres' className='align-middle' textAlign='center'>{data.prenom}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-membres' className='align-middle' textAlign='center'>{data.nom}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-membres' className='align-middle' textAlign='right'>{new Date(data.horodatage).toLocaleString()}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-membres' className='align-middle' textAlign='center'>{displayBoolean(data.actif)}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-membres' className='align-middle' textAlign='center'>{displayAction(data)}</TableSUI.Cell>
+            </TableSUI.Row>
         )
     }
-
 
     //Affichage de la liste des membres (data)
     const displayData = listMembres.membres.map(membreData => (toggleMembreDisable === false) 
@@ -163,24 +163,13 @@ const Membres = () => {
     )
 
 
-
     //Affichage de la liste des membres (en-tête)
     const displayTableMembres = listMembres.membres.length !== 0
-    ?   <Table className='mt-4' color='blue' inverted>
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell collapsing>#</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '110px'}}>Prénom</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '110px'}}>Nom</Table.HeaderCell>
-                    <Table.HeaderCell textAlign='right'>horodatage</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actif</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actions</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
-
-            <Table.Body style={{borderStyle: 'none'}}>{displayData}</Table.Body>
-            
-        </Table>
+    ?   <Table 
+            table={{className: 'mt-4 me-5', color: 'blue'}}
+            body={{style: {borderStyle: 'none'}}}
+            header={header}
+            displayData={displayData}/>
     : <div className='mt-4'>Aucun membre à afficher.</div>
 
 

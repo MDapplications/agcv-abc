@@ -7,7 +7,9 @@ const ResumeGlobal = ({saison}) => {
 
     //Hooks
 	const navigate = useNavigate()
+    
     //Redux
+    const {role} = useSelector(state => state.user)
     const stocks = useSelector(state => state.stocks)
 
 	//Affichage au format prix
@@ -93,11 +95,13 @@ const ResumeGlobal = ({saison}) => {
                             <Button 
                                 className='me-2' 
                                 variant='outline-secondary'
+                                disabled={role < 2}
                                 onClick={()=>handleClickCommandes(saison.id)}>
                                     Commandes membres
                             </Button>
                             <Button 
                                 variant='outline-secondary'
+                                disabled={role < 2}
                                 onClick={()=>handleClickCompetitions(saison.id)}>
                                     Compétitions
                             </Button>

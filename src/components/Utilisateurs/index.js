@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Container } from 'react-bootstrap'
-import { Table, Icon, Popup } from 'semantic-ui-react'
+import { Icon, Popup, Table as TableSUI } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteUser, getAllUsers, refreshAllUsers } from '../../Redux/actions/users'
 import Loader from '../Loader'
@@ -9,7 +9,9 @@ import Modal2Confirmation from '../Modal2Confirmation'
 import ModalEditUser from '../ModalEditUser'
 import toast from 'react-hot-toast'
 import { getPage } from '../../Redux/actions/pages'
+import { users as header } from '../../data/headers'
 import './index.css'
+import Table from '../Table'
 
 
 const Utilisateurs = () => {
@@ -161,15 +163,14 @@ const Utilisateurs = () => {
     const displayData = listUsers.Users.map(userData => {
         const date = new Date(userData.dateUpdate)
         return(
-            <Table.Row id={getIdActive(userData)} key={userData.id} active>
-                <Table.Cell id='cell-users' className='align-middle'>{userData.id}</Table.Cell>
-                <Table.Cell id='cell-users' className='align-middle'>{userData.identifiant}</Table.Cell>
-                <Table.Cell id='cell-users' className='align-middle' textAlign='center'>{showRole(userData.role)}</Table.Cell>
-                <Table.Cell id='cell-users' className='align-middle' textAlign='center'>{date.toLocaleString()}</Table.Cell>
-                <Table.Cell id='cell-users' className='align-middle' textAlign='center'>{displayBoolean(userData.actif)}</Table.Cell>
-                <Table.Cell id='cell-users' className='align-middle' textAlign='center'>{displayAction(userData)}</Table.Cell>
-            </Table.Row>
-            
+            <TableSUI.Row id={getIdActive(userData)} key={userData.id} active>
+                <TableSUI.Cell id='cell-users' className='align-middle'>{userData.id}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-users' className='align-middle'>{userData.identifiant}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-users' className='align-middle' textAlign='center'>{showRole(userData.role)}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-users' className='align-middle' textAlign='center'>{date.toLocaleString()}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-users' className='align-middle' textAlign='center'>{displayBoolean(userData.actif)}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-users' className='align-middle' textAlign='center'>{displayAction(userData)}</TableSUI.Cell>
+            </TableSUI.Row>  
         )
     })
 
@@ -177,21 +178,11 @@ const Utilisateurs = () => {
     
     //Affichage de la liste des utilisateur (en-tête)
     const displayTableUsers = listUsers.Users.length !== 0
-    ? <Table className='my-5' color='brown' inverted>
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell collapsing>#</Table.HeaderCell>
-                    <Table.HeaderCell>Identifiant</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '110px'}}>Rôle</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '200px'}}>Dernière MaJ</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actif</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actions</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
-
-            <Table.Body>{displayData}</Table.Body>
-            
-        </Table>        
+    ?    <Table 
+            table={{className: 'mt-4 me-5', color: 'brown'}}
+            header={header}
+            body={{style: {}}}
+            displayData={displayData}/>    
     : <div className='mt-4'>Aucun utilisateur à afficher.</div>
 
 

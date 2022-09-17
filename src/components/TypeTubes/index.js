@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Container } from 'react-bootstrap'
-import { Icon, Popup, Table } from 'semantic-ui-react'
+import { Icon, Popup, Table as TableSUI } from 'semantic-ui-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getPage } from '../../Redux/actions/pages'
 import { deleteTypetube, getAllTypetubes, refreshAllTypetubes } from '../../Redux/actions/typetubes'
@@ -12,6 +12,9 @@ import Loader from '../Loader'
 import './index.css'
 import ModalEditTypetube from '../ModalEditTypetube'
 import { createConsoVolant, getSaisonActive } from '../../Redux/actions/saisons'
+import Table from '../Table'
+import { typetubes as header } from '../../data/headers'
+
 
 
 const TypeTubes = () => {
@@ -193,40 +196,26 @@ const TypeTubes = () => {
     const displayData = typetubes.map(typetubeData => {
         const date = new Date(typetubeData.dateCreation)
         return(
-            <Table.Row id='row-typetubes' key={typetubeData.id} active>
-                <Table.Cell id='cell-typetubes' className='align-middle'>{typetubeData.id}</Table.Cell>
-                <Table.Cell id='cell-typetubes' className='align-middle'>{typetubeData.name}</Table.Cell>
-                <Table.Cell id='cell-typetubes' className='align-middle'>{typetubeData.comment}</Table.Cell>
-                <Table.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{typetubeData.lowLevel}</Table.Cell>
-                <Table.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{date.toLocaleString()}</Table.Cell>
-                <Table.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{displayBoolean(typetubeData.orderable)}</Table.Cell>
-                <Table.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{displayBoolean(typetubeData.default)}</Table.Cell>
-                <Table.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{displayAction(typetubeData)}</Table.Cell>
-            </Table.Row>
+            <TableSUI.Row id='row-typetubes' key={typetubeData.id} active>
+                <TableSUI.Cell id='cell-typetubes' className='align-middle'>{typetubeData.name}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-typetubes' className='align-middle'>{typetubeData.comment}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{typetubeData.lowLevel}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{date.toLocaleString()}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{displayBoolean(typetubeData.orderable)}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{displayBoolean(typetubeData.default)}</TableSUI.Cell>
+                <TableSUI.Cell id='cell-typetubes' className='align-middle' textAlign='center'>{displayAction(typetubeData)}</TableSUI.Cell>
+            </TableSUI.Row>
         )
     })
 
 
-
     //Affichage de la liste des typetubes (en-tête)
     const displayTableTypetube = typetubes.length !== 0
-    ?   <Table className='mt-4' color='blue' inverted>
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell collapsing>#</Table.HeaderCell>
-                    <Table.HeaderCell collapsing style={{width: '110px'}}>Type de tube</Table.HeaderCell>
-                    <Table.HeaderCell>Commentaire</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '110px'}}>Niveau bas</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '200px'}}>Créer le</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Commandable</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Défaut</Table.HeaderCell>
-                    <Table.HeaderCell collapsing textAlign='center' style={{width: '120px'}}>Actions</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
-
-            <Table.Body style={{borderStyle: 'none'}}>{displayData}</Table.Body>
-            
-        </Table>
+    ?   <Table 
+            table={{className: 'mt-4 me-5', color: 'blue'}}
+            body={{style: {borderStyle: 'none'}}}
+            header={header}
+            displayData={displayData}/>
     : <div className='mt-4'>Aucun type de tube à afficher.</div>
 
 

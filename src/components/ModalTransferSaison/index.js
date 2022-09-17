@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Col, Form, Row } from 'react-bootstrap'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
-import { transferSaison } from '../../Redux/actions/saisons'
+import { getSaison, transferSaison } from '../../Redux/actions/saisons'
 import AlertDanger from '../AlertDanger'
 import Loader from '../Loader'
 import ModalTemplate from '../ModalTemplate'
@@ -15,27 +15,39 @@ const ModalTransferSaison = ({hideModal}) => {
     const dispatch = useDispatch()
 
     //Redux
-    const {saisons, saisonActive, isLoadingTransfer, isTransferSuccess, errorTransfer} = useSelector(state => state.saisons)
+    const { saisons, 
+            saison, 
+            saisonActive, 
+            isLoadingGet,
+            isGetSaisonSuccess,
+            errorGet,
+            isLoadingTransfer, 
+            isTransferSuccess, 
+            errorTransfer} = useSelector(state => state.saisons)
     const {token} = useSelector(state => state.user)
 
     //States
     const [transferNOK, setTransferNOK] = useState(true)
     const [noStock, setNoStock] = useState(true)
+    const [saisonDataId, setSaisonDataId] = useState(0)
     const [saisonData, setSaisonData] = useState(null)
     const [requestTransfer, setRequestTransfer] = useState(false)
     const [errorMsg, setErrorMsg] = useState('')
+    const [requestGet, setRequestGet] = useState(false)
 
 
 
     useEffect(() => {
         if (saisonData === null && transferNOK && noStock) {
-            console.log(saisonActive)
             if (saisonActive.Stocks.length > 0) {
-                if (saisonActive.Stocks[0].value === 0) {
+                const stockValue = saisonActive.Stocks.reduce((prevValue, stock) => {
+                    return prevValue + stock.value
+                }, 0)
+                if (stockValue === 0) { // <------------- Faut remettre === ici
                     const dataFilter = saisons.filter(data => data.anneeFin === saisonActive.anneeDebut)
                     if (dataFilter.length > 0) {
                         setNoStock(false)
-                        setSaisonData(dataFilter[0])
+                        setSaisonDataId(dataFilter[0].id)
                     } else {
                         setNoStock(false)
                         setTransferNOK(false)
@@ -50,6 +62,29 @@ const ModalTransferSaison = ({hideModal}) => {
         }
     }, [saisonData, transferNOK, saisonActive, noStock, saisons])
 
+
+    useEffect(() => {
+        if (saisonData === null && transferNOK 
+                                && !noStock
+                                && saisonDataId !== 0
+                                && !isLoadingGet
+                                && requestGet === false
+                                && errorGet === '') {
+            console.log('getSaison')
+            setRequestGet(true)
+            dispatch(getSaison(token, saisonDataId))
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [saisonData, saisonDataId, isLoadingGet, requestGet, transferNOK, noStock, errorGet])
+
+    useEffect(() => {
+        if (saisonData === null && !isLoadingGet && isGetSaisonSuccess && requestGet && errorGet === '') {
+            setSaisonData(saison)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [saisonData, isLoadingGet, isGetSaisonSuccess, requestGet, saison])
+    
+    
 
     useEffect(() => {
         if (requestTransfer && !isLoadingTransfer && errorTransfer !== '') {
@@ -104,18 +139,31 @@ const ModalTransferSaison = ({hideModal}) => {
             </Form.Label>
         </Col>
     </Row>
-    : <Row className='mt-2'>
-        <Col md={md}>
-            <Form.Label className='mb-0 mt-2'>
-                Saison précédente :
-            </Form.Label>
-        </Col>
-        <Col md={md}>
-            <Form.Label className='mb-0 mt-2'>
-                Aucune saison trouvée
-            </Form.Label>
-        </Col>
-    </Row>
+    : isLoadingGet
+        ? <Row className='mt-2'>
+            <Col md={md}>
+                <Form.Label className='mb-0 mt-2'>
+                    Saison précédente :
+                </Form.Label>
+            </Col>
+            <Col md={md}>
+                <Form.Label className='mb-0 mt-2'>
+                    Récupération de la saison précédente...
+                </Form.Label>
+            </Col>
+        </Row>
+        : <Row className='mt-2'>
+            <Col md={md}>
+                <Form.Label className='mb-0 mt-2'>
+                    Saison précédente :
+                </Form.Label>
+            </Col>
+            <Col md={md}>
+                <Form.Label className='mb-0 mt-2'>
+                    Aucune saison trouvée
+                </Form.Label>
+            </Col>
+        </Row>
 
     const displayExplain = noStock
     ? <>
@@ -141,7 +189,7 @@ const ModalTransferSaison = ({hideModal}) => {
     // render
     return <ModalTemplate 
                 hideModal={hideModal} 
-                //styleBody={{width: '400px'}}
+                disabledBack={isLoadingGet}
                 title='Transfert de données entre saison'
                 btnConfirm={displayBtnConfirm}>
                     {displayError}

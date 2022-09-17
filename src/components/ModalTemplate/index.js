@@ -7,6 +7,7 @@ const ModalTemplate = ({hideModal,
                         styleBody,
                         captionBtnConfirm, 
                         captionBtnBack,
+                        disabledBack,
                         btnConfirm,
                         children}) => {
 
@@ -14,6 +15,7 @@ const ModalTemplate = ({hideModal,
     const [captionConfirm, setCaptionConfirm] = useState('Valider')
     const [captionBack, setCaptionBack] = useState('Annuler')
     const [buttonConfirm, setButtonConfirm] = useState(null)
+    const [disableBack, setDisableBack] = useState(false)
 
 
     useEffect(() => {
@@ -21,6 +23,12 @@ const ModalTemplate = ({hideModal,
             setCaptionConfirm(captionBtnConfirm)
         }
     }, [captionBtnConfirm])
+
+    useEffect(() => {
+        if (disabledBack !== undefined) {
+            setDisableBack(disabledBack)
+        }
+    }, [disabledBack])
     
 
     useEffect(() => {
@@ -61,7 +69,7 @@ const ModalTemplate = ({hideModal,
                             {buttonConfirm}
                         </span>
                         <span>
-                            <Button variant='danger' onClick={hideModal}>{captionBack}</Button>
+                            <Button variant='danger' onClick={hideModal} disabled={disableBack}>{captionBack}</Button>
                         </span>
                     </Modal.Footer>
                 </div>

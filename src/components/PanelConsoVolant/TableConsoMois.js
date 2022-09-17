@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Popup, Table } from 'semantic-ui-react'
 import { editConsoMois } from '../../Redux/actions/consomois'
-import { initSaisons } from '../../Redux/actions/saisons'
+import { getSaisonActive } from '../../Redux/actions/saisons'
 
 const TableConsoMois = ({saison, moisData, orderable}) => {
 
@@ -11,7 +11,7 @@ const TableConsoMois = ({saison, moisData, orderable}) => {
     const dispatch = useDispatch()
 
     //Redux
-    const {token} = useSelector(state => state.user)
+    const {token, role} = useSelector(state => state.user)
     const {saisonActive} = useSelector(state => state.saisons)
     const {prixtubes} = useSelector(state => state.prixtubes)
     const {isLoadingEdit, isEditSuccess} = useSelector(state => state.consomois)
@@ -30,12 +30,22 @@ const TableConsoMois = ({saison, moisData, orderable}) => {
     useEffect(() => {
         if (loadConsoMois && isEditSuccess) {
           setloadConsoMois(false)
-          dispatch(initSaisons())
+          dispatch(getSaisonActive(token))
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [loadConsoMois, isEditSuccess, token])
     
-    useEffect(() => {if (actionValid) if (saison.id !== saisonActive.id) setActionValid(false)}, [actionValid, saison, saisonActive])
+    useEffect(() => {
+        if (actionValid) { 
+            if (role >= 2) {
+                if (saison.id !== saisonActive.id) {
+                    setActionValid(false)
+                }
+            } else {
+                setActionValid(false)
+            }
+        }
+    }, [actionValid, saison, saisonActive, role])
     
 
 

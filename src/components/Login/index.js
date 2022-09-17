@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUser } from '../../Redux/actions/user'
 import AlertDanger from '../AlertDanger'
 import toast from 'react-hot-toast'
+import Loader from '../Loader'
 import { initPage } from '../../Redux/actions/pages'
 import { initStocks } from '../../Redux/actions/stocks'
 import { initSaisonActive } from '../../Redux/actions/saisons'
@@ -52,8 +53,6 @@ const Login = () => {
 
     useEffect(() => {
         if (!User.isLoading && User.hasOwnProperty('error') && User.error.hasOwnProperty('response')) {
-            console.log(User.error)
-            console.log(User.error.response.status)
             if (User.error.response.status > 0) {
                 setErrorAlert({code: User.error.response.status, message: User.error.response.data.message, enabled: true})
             } else {
@@ -94,9 +93,10 @@ const Login = () => {
     }
    
 
-    const btnConnexion =  username === '' || 
-    password === ''
-    ? <Button className='mb-4' variant='primary' disabled>Se connecter</Button>
+    const btnConnexion =  username === '' || password === ''
+    ? User.isLoading 
+        ? <Loader isMsg={false}/>
+        : <Button className='mb-4' variant='primary' disabled>Se connecter</Button>
     : <Button className='mb-4' variant='primary' as='input' type='submit' value="Se connecter"/>
 
 
