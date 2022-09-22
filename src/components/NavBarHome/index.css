@@ -6,9 +6,8 @@
 
 
 #a-home:hover {
-    background-color: rgb(80, 80, 80);
+    background-color: #727272;
     cursor: pointer;
-    color: white;
 }
 
 #back-home:hover {

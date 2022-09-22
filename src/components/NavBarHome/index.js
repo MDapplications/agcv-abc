@@ -12,7 +12,12 @@ const NavBarHome = ({showModalChangePassword}) => {
 
     //Style
     const navBarColor = {
-        backgroundColor: '#bbbbbb'
+        backgroundColor: 'rgb(80, 80, 80)',
+    }
+
+    const styleLink = {
+        fontSize: '1.3em',
+        color: 'white'
     }
 
     const expand = 'xl'
@@ -20,16 +25,16 @@ const NavBarHome = ({showModalChangePassword}) => {
     const displayLinkAdmin = role > 1 && <Link  id='go-admin' 
                                                 className='nav-link link-secondary align-middle' 
                                                 to='/admin'
-                                                style={{fontSize: '1.3em'}}>
+                                                style={styleLink}>
                                                     Admin
                                             </Link>
 
     //render
     return (
-        <Navbar variant='light' expand={expand} className='py-sm-0' style={navBarColor}>
+        <Navbar variant='dark' expand={expand} className='py-sm-0' style={navBarColor}>
             <Container fluid>
                     
-                <div id='a-home' className='py-2 nav-link link-dark align-middle' onClick={showModalChangePassword} style={{fontSize: '1.3em'}}>
+                <div id='a-home' className='py-2 nav-link link-dark align-middle' onClick={showModalChangePassword} style={styleLink}>
                     {username}
                 </div>
 

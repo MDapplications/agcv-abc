@@ -13,7 +13,12 @@ const NavBarAdmin = ({showModalChangePassword}) => {
 
     //Style
     const navBarColor = {
-        backgroundColor: '#bbbbbb'
+        backgroundColor: 'rgb(80, 80, 80)',
+    }
+
+    const styleLink = {
+        fontSize: '1.3em',
+        color: 'white'
     }
 
     const expand = 'xl'
@@ -21,17 +26,17 @@ const NavBarAdmin = ({showModalChangePassword}) => {
     const displayLinkUsers = role > 2 && <Link  id='a-admin' 
                                                 className='nav-link link-secondary' 
                                                 to='users'
-                                                style={{fontSize: '1.3em'}}>
+                                                style={styleLink}>
                                                     Gestion des utilisateurs
                                                 </Link> 
 
     //render
     return (
-        <Navbar variant='light' expand={expand} className='py-sm-0' style={navBarColor}>
+        <Navbar variant='dark' expand={expand} className='py-sm-0' style={navBarColor}>
             <Container fluid>
                 
                 <div className='d-flex justify-content-start'>
-                    <div id='a-admin' className='py-2 nav-link link-dark' onClick={showModalChangePassword} style={{fontSize: '1.3em'}}>{username}</div>
+                    <div id='a-admin' className='py-2 nav-link link-dark' onClick={showModalChangePassword} style={styleLink}>{username}</div>
                 </div>
 
                 <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
@@ -44,14 +49,14 @@ const NavBarAdmin = ({showModalChangePassword}) => {
                             
                             <Nav className='me-5'> 
 
-                                <Link id='a-admin' className='nav-link link-secondary' to='' style={{fontSize: '1.3em'}}>Paramètres de la saison</Link>
+                                <Link id='a-admin' className='nav-link link-secondary' to='' style={styleLink}>Paramètres de la saison</Link>
                                 {displayLinkUsers}
-                                <Link id='a-admin' className='nav-link link-secondary' to='saisons' style={{fontSize: '1.3em'}}>Saisons</Link>  
-                                <Link id='a-admin' className='nav-link link-secondary' to='membres' style={{fontSize: '1.3em'}}>Membres</Link>  
-                                <Link id='a-admin' className='nav-link link-secondary' to='prixtubes' style={{fontSize: '1.3em'}}>Prix des tubes</Link>
-                                <Link id='a-admin' className='nav-link link-secondary' to='typetubes' style={{fontSize: '1.3em'}}>Types de tube</Link>
+                                <Link id='a-admin' className='nav-link link-secondary' to='saisons' style={styleLink}>Saisons</Link>  
+                                <Link id='a-admin' className='nav-link link-secondary' to='membres' style={styleLink}>Membres</Link>  
+                                <Link id='a-admin' className='nav-link link-secondary' to='prixtubes' style={styleLink}>Prix des tubes</Link>
+                                <Link id='a-admin' className='nav-link link-secondary' to='typetubes' style={styleLink}>Types de tube</Link>
                                 
-                                <Link id='back-home' className='nav-link link-secondary' to='/home' style={{fontSize: '1.3em'}}>Page principale</Link>
+                                <Link id='back-home' className='nav-link link-secondary' to='/home' style={styleLink}>Page principale</Link>
 
                             </Nav>
                             <BtnLogout/>
